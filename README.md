@@ -15,7 +15,7 @@ To install the C-GB, please refer to C-GB.
 To download the related wrappers, use the following links;
 
 <ol>
-<li> [GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)</li>
+<li>[GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)</li>
 <li> [TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)</li>
 <ol>
 
