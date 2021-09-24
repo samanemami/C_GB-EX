@@ -13,14 +13,17 @@ First, the C-GB package should be installed.
 To use TFBT and GBDTMO, first, you have to install the related packages and then use their wrapper.
 To install the C-GB, please refer to C-GB.
 To download the related wrappers, use the following links;
+
 <ol>
 <li> [GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)</li>
 <li> [TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)</li>
 <ol>
+
 # Models used for comparison
+
 <ol>
   <li> C-GB </li>
-  <li> [GBDTM-O]https://github.com/zzd1992/GBDTMO </li>
+  <li> [GBDTM-O](https://github.com/zzd1992/GBDTMO) </li>
   <li> [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)</li>
   <li> [TFBT](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesClassifier)</li>
 </ol>
