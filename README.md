@@ -14,10 +14,11 @@ To use TFBT and GBDTMO, first, you have to install the related packages and then
 To install the C-GB, please refer to C-GB.
 To download the related wrappers, use the following links;
 
-<ol>
-<li>[GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)</li>
-<li> [TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)</li>
-<ol>
+
+[GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)
+
+[TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)
+
 
 # Models used for comparison
 
