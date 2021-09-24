@@ -15,16 +15,15 @@ To install the C-GB, please refer to C-GB.
 To download the related wrappers, use the following links;
 
 
-[GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)
-
-[TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)
+* [GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)
+* [TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)
 
 
 # Models used for comparison
 
 
 * C-GB 
-* (GBDTM-O)[https://github.com/zzd1992/GBDTMO]
+* [GBDTM-O](https://github.com/zzd1992/GBDTMO)
 * [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
 * [TFBT](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesClassifier)
 
