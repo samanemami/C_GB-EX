@@ -22,12 +22,12 @@ To download the related wrappers, use the following links;
 
 # Models used for comparison
 
-<ol>
-<li>C-GB </li>
-<li>(GBDTM-O)[https://github.com/zzd1992/GBDTMO] </li>
-<li>[GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)</li>
-<li>[TFBT](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesClassifier)</li>
-</ol>
+
+* C-GB 
+* (GBDTM-O)[https://github.com/zzd1992/GBDTMO]
+* [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
+* [TFBT](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesClassifier)
+
 
 # Requirements
 <ol>
