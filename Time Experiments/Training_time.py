@@ -1,4 +1,4 @@
-#%%
+# %%
 import numpy as np
 import pandas as pd
 from time import process_time
@@ -16,7 +16,7 @@ X, y = dt.load_iris(return_X_y=True)
 max_depth = 10
 random_state = 1
 n = 100
-
+path = '/home/[user]/.local/lib/python[version]/site-packages/gbdtmo/build/gbdtmo.so'
 
 t_cgb = np.zeros((n,))
 t_mart = np.zeros((n,))
