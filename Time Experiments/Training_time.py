@@ -1,29 +1,27 @@
 #%%
-from IPython.display import clear_output
-from Scikit_CGB import C_GradientBoostingClassifier
-from TFBT import BoostedTreesClassifier
-from sklearn.model_selection import ShuffleSplit
-import sklearn.datasets as dt
-from sklearn.ensemble import GradientBoostingClassifier
 import numpy as np
-from time import process_time
 import pandas as pd
+from time import process_time
+import sklearn.datasets as dt
+from IPython.display import clear_output
+from sklearn.model_selection import ShuffleSplit
 
+from TFBT import BoostedTreesClassifier
+from Scikit_CGB import C_GradientBoostingClassifier
+from gbdtmo_wrapper import regression, classification
+from sklearn.ensemble import GradientBoostingClassifier
 
 X, y = dt.load_iris(return_X_y=True)
 
 max_depth = 10
 random_state = 1
-n = 10
+n = 100
 
 
 t_cgb = np.zeros((n,))
 t_mart = np.zeros((n,))
 t_tfbt = np.zeros((n,))
 t_gbdtmo = np.zeros((n,))
-
-
-gbnn_err = []
 
 
 kfold_gen = ShuffleSplit(n_splits=n, test_size=0.2, random_state=random_state)
@@ -40,9 +38,9 @@ for i, (train_index, test_index) in enumerate(kfold_gen.split(X, y)):
                                        criterion="mse",
                                        loss="deviance",
                                        n_estimators=100)
-    t0 = time()
+    t0 = process_time()
     cgb.fit(x_train, y_train)
-    t_cgb[i-1] = (time()-t0)
+    t_cgb[i-1] = (process_time()-t0)
 
     mart = GradientBoostingClassifier(max_depth=max_depth,
                                       subsample=0.75,
@@ -51,9 +49,9 @@ for i, (train_index, test_index) in enumerate(kfold_gen.split(X, y)):
                                       random_state=random_state,
                                       criterion="mse",
                                       n_estimators=100)
-    t0 = time()
+    t0 = process_time()
     mart.fit(x_train, y_train)
-    t_mart[i-1] = (time()-t0)
+    t_mart[i-1] = (process_time()-t0)
 
     tfbt = TFBT.BoostedTreesClassifier(label_vocabulary=None,
                                        n_trees=100,
@@ -64,18 +62,31 @@ for i, (train_index, test_index) in enumerate(kfold_gen.split(X, y)):
                                        )
 
     tfbt.fit(x_train, y_train)
-    t_tfbt[i-1] = (tfbt._training_time())
+    t_tfbt[i-1] = (tfbt._model_complexity()[0])
+
+    gbdtm = classification(max_depth=5,
+                           learning_rate=0.1,
+                           random_state=1,
+                           num_boosters=100,
+                           lib=path,
+                           subsample=1.0,
+                           verbose=False,
+                           num_eval=0)
+
+    gbdtm.fit(x_train, y_train)
+    t_gbdtmo[i-1] = (gbdtm._model_complexity()[0])
+
     clear_output()
-    print('*', end='')
+
 
 result = {}
 result['Time_CGB'] = t_cgb
 result['Time_MART'] = t_mart
 result['Time_TFBT'] = t_tfbt
+result['Time_GBDTMO'] = t_gbdtmo
 
 mean = pd.DataFrame(result).agg('mean', axis=0)
 std = pd.DataFrame(result).agg('std', axis=0)
 concat = pd.concat([mean, std], axis=1, keys=['Mean', 'Std'])
-pd.DataFrame(result).to_csv('Asus_iris-max depth'+str(max_depth)+'.csv')
-(concat).to_csv('Asus_iris_summary_max_depth'+str(max_depth)+'.csv')
-mean
+pd.DataFrame(result).to_csv('iris-max depth'+str(max_depth)+'.csv')
+(concat).to_csv('iris_summary_max_depth'+str(max_depth)+'.csv')
