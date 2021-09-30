@@ -15,7 +15,8 @@ X, y = dt.load_iris(return_X_y=True)
 max_depth = 10
 random_state = 1
 n = 100
-path = '/home/[user]/.local/lib/python[version]/site-packages/gbdtmo/build/gbdtmo.so'
+path = 'path to lib.so'
+temp_path = 'path to remove tf.logs'
 
 t_cgb = np.zeros((n,))
 t_mart = np.zeros((n,))
@@ -30,9 +31,9 @@ for i, (train_index, test_index) in enumerate(kfold_gen.split(X, y)):
     y_train, y_test = y[train_index], y[test_index]
 
     cgb = C_GradientBoostingClassifier(max_depth=max_depth,
-                                       subsample=0.5,
-                                       #    max_features="sqrt",
-                                       learning_rate=0.05,
+                                       subsample=1.0,
+                                       max_features="sqrt",
+                                       learning_rate=0.1,
                                        random_state=random_state,
                                        criterion="mse",
                                        loss="deviance",
@@ -42,9 +43,9 @@ for i, (train_index, test_index) in enumerate(kfold_gen.split(X, y)):
     t_cgb[i-1] = (process_time()-t0)
 
     mart = GradientBoostingClassifier(max_depth=max_depth,
-                                      subsample=0.75,
+                                      subsample=1.0,
                                       max_features="sqrt",
-                                      learning_rate=0.025,
+                                      learning_rate=0.1,
                                       random_state=random_state,
                                       criterion="mse",
                                       n_estimators=100)
@@ -57,15 +58,15 @@ for i, (train_index, test_index) in enumerate(kfold_gen.split(X, y)):
                                        max_depth=max_depth,
                                        learning_rate=0.025,
                                        max_steps=100,
-                                       model_dir=r'C:\Users\saman\Downloads\iristfbt'
+                                       model_dir=temp_path
                                        )
 
     tfbt.fit(x_train, y_train)
     t_tfbt[i-1] = (tfbt._model_complexity()[0])
 
-    gbdtm = classification(max_depth=5,
+    gbdtm = classification(max_depth=max_depth,
                            learning_rate=0.1,
-                           random_state=1,
+                           random_state=random_state,
                            num_boosters=100,
                            lib=path,
                            subsample=1.0,
