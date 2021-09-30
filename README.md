@@ -43,10 +43,10 @@ There are related codes for different experiments. The experiments are as follow
 
 
 # Requirements
-<ol>
+<ul>
   <li> Numpy </li>
   <li> Pandas </li>
   <li> Matplotlib </li>
   <li> ctypes </li>
   <li> SciPy </li>
-</ol>
+</ul>
