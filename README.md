@@ -41,6 +41,8 @@ There are related codes for different experiments. The experiments are as follow
   <li> Measuring the loss curve </li>
 </ul>
 
+To make the comparison more user-friendly, we developed related wrappers with the access link to clone/install.
+
 
 # Requirements
 <ul>
