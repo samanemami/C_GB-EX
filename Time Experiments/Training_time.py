@@ -14,7 +14,7 @@ X, y = dt.load_iris(return_X_y=True)
 
 max_depth = 10
 random_state = 1
-n = 100
+n = 10
 path = 'path to lib.so'
 temp_path = 'path to remove tf.logs'
 
