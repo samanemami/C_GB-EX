@@ -88,5 +88,5 @@ result['Time_GBDTMO'] = t_gbdtmo
 mean = pd.DataFrame(result).agg('mean', axis=0)
 std = pd.DataFrame(result).agg('std', axis=0)
 concat = pd.concat([mean, std], axis=1, keys=['Mean', 'Std'])
-pd.DataFrame(result).to_csv('iris-max depth'+str(max_depth)+'.csv')
-(concat).to_csv('iris_summary_max_depth'+str(max_depth)+'.csv')
+pd.DataFrame(result).to_csv('result.csv')
+(concat).to_csv('summary.csv')
