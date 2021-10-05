@@ -42,7 +42,19 @@ There are related codes for different experiments. The experiments are as follow
 
 To make the comparison more user-friendly, we developed related wrappers with the access link to clone/install.
 
-![![alt text](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)
+## Visualization
+
+Decision boundary
+In the following, you will find an example of decision boundary for three studied models, including our Condensed Gradient Boosting model.
+
+![![classification](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)
+
+
+Regression example
+Here, the C-GB model is trained at the same time for a multi-output regression problem with two outputs in one training procedure. As the plots show, the model works perfectly for all of the outputs.
+
+![![regression](https://github.com/samanemami/C_GB-EX/tree/main/docs)](https://github.com/samanemami/C_GB-EX/tree/main/docs)
+
 
 
 # Requirements
