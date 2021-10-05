@@ -1,6 +1,3 @@
-import sys
-sys.path.append('/home/oem/Programming/Scikit_CGB')
-
 from sklearn.ensemble import GradientBoostingClassifier
 from Scikit_CGB import C_GradientBoostingClassifier
 from wrapper import regression, classification
@@ -10,9 +7,8 @@ from sklearn import datasets as dts
 import memory_profiler
 
 
-
 X, y = dts.load_digits(return_X_y=True)
-path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
+path = 'path to so lib'
 LIB = load_lib(path)
 
 
@@ -28,7 +24,6 @@ def cgb():
 
   model.fit(X, y)
 
-
 def gbdtmo():
     model = classification(max_depth=10,
                            learning_rate=0.1,
@@ -41,7 +36,6 @@ def gbdtmo():
                            )
     model.fit(X, y)
 
-
 def mart():
   model = GradientBoostingClassifier(max_depth=10,
                                      subsample=1,
@@ -53,17 +47,16 @@ def mart():
                                      n_estimators=100)
   model.fit(X, y)
 
-
 def tfbt():
   model = BoostedTreesClassifier(label_vocabulary=None,
                                  n_trees=i,
                                  max_depth=5,
                                  learning_rate=0.1,
                                  steps=100,
-                                 model_dir='/home/oem/Desktop/temp'
+                                 model_dir=None
                                  )
   model.fit(X, y)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
   cgb()
