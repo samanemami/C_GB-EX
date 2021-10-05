@@ -53,7 +53,7 @@ In the following, you will find an example of decision boundary for three studie
 Regression example
 Here, the C-GB model is trained at the same time for a multi-output regression problem with two outputs in one training procedure. As the plots show, the model works perfectly for all of the outputs.
 
-![![regression](https://github.com/samanemami/C_GB-EX/tree/main/docs)](https://github.com/samanemami/C_GB-EX/tree/main/docs)
+![![regression](https://github.com/samanemami/C_GB-EX/blob/main/docs/Regression.png)](https://github.com/samanemami/C_GB-EX/blob/main/docs/Regression.png)
 
 
 
