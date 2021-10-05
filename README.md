@@ -64,4 +64,5 @@ Here, the C-GB model is trained at the same time for a multi-output regression p
   <li> Matplotlib </li>
   <li> ctypes </li>
   <li> SciPy </li>
+  <li> Numba </li>
 </ul>
