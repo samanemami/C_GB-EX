@@ -42,7 +42,7 @@ There are related codes for different experiments. The experiments are as follow
 
 To make the comparison more user-friendly, we developed related wrappers with the access link to clone/install.
 
-![![alt text](/home/oem/Desktop/C_GB-EX/Decision boundary/docs/example.jpg)](/home/oem/Desktop/C_GB-EX/Decision boundary/docs/example.jpg)
+![![alt text](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)
 
 
 # Requirements
