@@ -23,7 +23,6 @@ To download the related wrappers, use the following links;
 
 # Models used for comparison
 
-
 * C-GB 
 * [GBDTM-O](https://github.com/zzd1992/GBDTMO)
 * [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
@@ -42,6 +41,8 @@ There are related codes for different experiments. The experiments are as follow
 </ul>
 
 To make the comparison more user-friendly, we developed related wrappers with the access link to clone/install.
+
+![![alt text](/home/oem/Desktop/C_GB-EX/Decision boundary/docs/example.jpg)](/home/oem/Desktop/C_GB-EX/Decision boundary/docs/example.jpg)
 
 
 # Requirements
