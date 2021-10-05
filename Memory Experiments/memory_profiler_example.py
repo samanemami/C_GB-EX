@@ -11,7 +11,7 @@ X, y = dts.load_digits(return_X_y=True)
 path = 'path to so lib'
 LIB = load_lib(path)
 
-
+@profile
 def cgb():
   model = C_GradientBoostingClassifier(max_depth=10,
                                        subsample=1,
@@ -24,6 +24,7 @@ def cgb():
 
   model.fit(X, y)
 
+@profile
 def gbdtmo():
     model = classification(max_depth=10,
                            learning_rate=0.1,
@@ -36,6 +37,7 @@ def gbdtmo():
                            )
     model.fit(X, y)
 
+@profile
 def mart():
   model = GradientBoostingClassifier(max_depth=10,
                                      subsample=1,
@@ -47,6 +49,7 @@ def mart():
                                      n_estimators=100)
   model.fit(X, y)
 
+@profile
 def tfbt():
   model = BoostedTreesClassifier(label_vocabulary=None,
                                  n_trees=i,
