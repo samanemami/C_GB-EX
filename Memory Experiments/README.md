@@ -24,3 +24,4 @@ Also, the examples contain the plotting part.
 After installing memory_profiler, you may run `python -m memory_profiler_example.py` in the python interpreter.
 To install and plot a memory usage with the profiler, refer to this [library](https://pypi.org/project/memory-profiler/).
 Also, if you run `mprof run memory_profiler_example.py` and then `mprof plot`, you will have a memory usage trend.
+After running `mprof run memory_profiler_example.py`, it gives you a [dat](/mprofile_20211005101227.dat) file regarding the consumed memory.
