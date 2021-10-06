@@ -9,7 +9,6 @@ import memory_profiler
 
 X, y = dts.load_digits(return_X_y=True)
 path = 'path to so lib'
-LIB = load_lib(path)
 
 @profile
 def cgb():
