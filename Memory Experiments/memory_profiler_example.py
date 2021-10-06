@@ -51,7 +51,7 @@ def mart():
 @profile
 def tfbt():
   model = BoostedTreesClassifier(label_vocabulary=None,
-                                 n_trees=i,
+                                 n_trees=100,
                                  max_depth=10,
                                  learning_rate=0.1,
                                  steps=100,
