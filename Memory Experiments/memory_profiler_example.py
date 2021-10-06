@@ -52,7 +52,7 @@ def mart():
 def tfbt():
   model = BoostedTreesClassifier(label_vocabulary=None,
                                  n_trees=i,
-                                 max_depth=5,
+                                 max_depth=10,
                                  learning_rate=0.1,
                                  steps=100,
                                  model_dir=None
