@@ -63,3 +63,6 @@ def tfbt():
 
 if __name__ == '__main__':
   cgb()
+  gbdtmo()
+  mart()
+  tfbt()
