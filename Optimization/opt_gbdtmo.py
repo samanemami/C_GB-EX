@@ -9,7 +9,7 @@ def grid(estimator: 'model', X: np.array,
          param_grid: dict,
          random_state: 'int32') -> "Optimize the model":
 
-    score = np.zeros((cv, y.shape[1]))
+    score = np.zeros((cv, ))
 
     if type_of_target(y) == 'multiclass' or 'binary':
         kfold = StratifiedKFold(n_splits=cv, shuffle=True,
@@ -28,4 +28,8 @@ def grid(estimator: 'model', X: np.array,
         for param in grid:
             model = estimator(param)
             model.fit(x_train, y_train)
-            model.score(x_test, y_test)
+            score[cv_i, ] = model.score(x_test, y_test)
+
+        best_param = grid[np.where(score == np.amax(score))[0][0]]
+
+    return score, best_param
