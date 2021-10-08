@@ -4,7 +4,7 @@ from wrapper import regression, classification
 from gbdtmo import GBDTMulti, load_lib
 from TFBT import BoostedTreesClassifier
 from sklearn import datasets as dts
-import memory_profiler
+from memory_profiler import profile
 
 
 X, y = dts.load_digits(return_X_y=True)
