@@ -25,8 +25,8 @@ def gridsearch(X, y, cv, random_state, path, param_grid):
         y_train, y_test = y[train_index], y[test_index]
 
         for cv_grid in range(len(grid)):
-            learning_rate = (list(grid[cv_grid].values())[1])
             max_depth = (list(grid[cv_grid].values())[0])
+            learning_rate = (list(grid[cv_grid].values())[1])
             subsample = (list(grid[cv_grid].values())[2])
 
             if type_of_target(y) == 'multiclass' or 'binary':
