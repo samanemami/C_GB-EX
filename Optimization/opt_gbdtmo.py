@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import pandas as pd
 from itertools import product
@@ -5,11 +6,17 @@ import sklearn.datasets as dts
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.utils.multiclass import type_of_target
+from gbdtmo_wrapper import classification, regression
 
-cv = 10
-random_state = 1
 
 X, y = dts.load_iris(return_X_y=True)
+
+
+path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
+cv = 2
+random_state = 1
+
+
 
 param_grid = {"max_depth": [2, 5, 10, 20],
               "learning_rate": [0.025, 0.05, 0.1, 0.5, 1],
@@ -32,19 +39,29 @@ for cv_i, (train_index, test_index) in enumerate(kfold.split(X, y)):
     y_train, y_test = y[train_index], y[test_index]
 
     for cv_grid in range(len(grid)):
-        lr = (list(grid[cv_grid].values())[0])
-        depth = (list(grid[cv_grid].values())[1])
-        sub = (list(grid[cv_grid].values())[2])
+        learning_rate = (list(grid[cv_grid].values())[1])
+        max_depth = (list(grid[cv_grid].values())[0])
+        subsample = (list(grid[cv_grid].values())[2])
 
-        model = GradientBoostingClassifier(learning_rate=lr,
-                                           max_depth=depth,
-                                           subsample=sub)
+        model = classification(max_depth=max_depth,
+                               learning_rate=learning_rate,
+                               random_state=random_state,
+                               num_boosters=100,
+                               lib=path,
+                               subsample=subsample,
+                               verbose=False,
+                               num_eval=0
+                               )
 
         model.fit(x_train, y_train)
         score[cv_i, cv_grid] = model.score(x_test, y_test)
+
 
 
 cv_result = pd.DataFrame(score)
 score = np.mean(score, axis=0)
 best_param = grid[np.where(score == np.amax(score))[0][0]]
 best_score = np.amax(score)
+#%%
+score
+best_param
