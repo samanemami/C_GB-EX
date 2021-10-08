@@ -1,7 +1,7 @@
 # C_GB-EX
 Condensed Gradient Boosting Decision Tree - Examples
 
-# About this rep
+# About
 This project has two purposes:
 <ul>
 <li> provides real examples to use C-GB </li>
