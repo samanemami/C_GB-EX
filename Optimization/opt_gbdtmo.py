@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 from itertools import product
@@ -6,7 +7,19 @@ from sklearn.utils.multiclass import type_of_target
 from gbdtmo_wrapper import classification, regression
 
 
-def gridsearch(X, y, cv, random_state, path, param_grid):
+def ProgressBar(percent, barLen=20):
+    sys.stdout.write("\r")
+    progress = ""
+    for i in range(barLen):
+        if i < int(barLen * percent):
+            progress += "="
+        else:
+            progress += " "
+    sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
+    sys.stdout.flush()
+
+
+def gridsearch(X, y, cv, random_state, path, param_grid, verbose):
 
     grid = [dict(zip(param_grid, v))
             for v in product(*param_grid.values())]
@@ -54,7 +67,8 @@ def gridsearch(X, y, cv, random_state, path, param_grid):
 
             model.fit(x_train, y_train)
             score[cv_i, cv_grid] = model.score(x_test, y_test)
-            print('*', end='')
+            if verbose:
+                ProgressBar(cv_grid/abs(len(grid)-1), barLen=len(grid))
 
     cv_result = pd.DataFrame(score)
     score = np.mean(score, axis=0)
@@ -64,13 +78,11 @@ def gridsearch(X, y, cv, random_state, path, param_grid):
     score_std = np.amax(score_std) if type_of_target(
         y) == 'multiclass' or 'binary' else np.amin(score_std)
     best_params = []
-    if np.where(score == best_score)[0].shape[0] > 1:
-        for i, j in enumerate(np.where(score == best_score)[0]):
-            best_params.append(grid[np.where(score == best_score)[0][i]])
-    else:
-        best_params = grid[np.where(score == best_score)[0][0]]
+    for i, j in enumerate(np.where(score == best_score)[0]):
+        best_params.append(grid[np.where(score == best_score)[0][i]])
 
     result = {}
     result['best_score'] = best_score
     result['score_std'] = score_std
     pd.Series(result).to_csv('result.csv')
+    pd.DataFrame(best_params, index=['best_Params']).to_csv('best_parasm.csv')
