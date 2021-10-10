@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from itertools import product
 from sklearn.model_selection import StratifiedKFold, KFold
-from sklearn.utils.multiclass import type_of_target
 from gbdtmo_wrapper import classification, regression
 
 
@@ -19,18 +18,19 @@ def ProgressBar(percent, barLen=20):
     sys.stdout.flush()
 
 
-def gridsearch(X, y, cv, random_state, path, param_grid, verbose):
+def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, Classification):
 
     grid = [dict(zip(param_grid, v))
             for v in product(*param_grid.values())]
-    score = np.zeros((cv, len(grid)))
+    score = np.zeros((cv, len(grid))) if Classification is True else np.zeros(
+        (cv, len(grid), y.shape[1]))
 
-    if type_of_target(y) == 'multiclass' or 'binary':
+    if Classification is True:
         kfold = StratifiedKFold(n_splits=cv, shuffle=True,
                                 random_state=random_state)
 
     else:
-        kfold = kfold(n_splits=cv, shuffle=True,
+        kfold = KFold(n_splits=cv, shuffle=True,
                       random_state=random_state)
 
     for cv_i, (train_index, test_index) in enumerate(kfold.split(X, y)):
@@ -42,17 +42,17 @@ def gridsearch(X, y, cv, random_state, path, param_grid, verbose):
             learning_rate = (list(grid[cv_grid].values())[1])
             subsample = (list(grid[cv_grid].values())[2])
 
-            if type_of_target(y) == 'multiclass' or 'binary':
+            if Classification is True:
 
                 model = classification(max_depth=max_depth,
                                        learning_rate=learning_rate,
                                        random_state=random_state,
                                        num_boosters=100,
                                        lib=path,
-                                       subsample=subsample,
-                                       verbose=False,
-                                       num_eval=0
-                                       )
+                                       subsample=subsample)
+
+                model.fit(x_train, y_train)
+                score[cv_i, cv_grid] = model.score(x_test, y_test)
 
             else:
                 model = regression(max_depth=max_depth,
@@ -60,23 +60,19 @@ def gridsearch(X, y, cv, random_state, path, param_grid, verbose):
                                    random_state=random_state,
                                    num_boosters=100,
                                    lib=path,
-                                   subsample=subsample,
-                                   verbose=False,
-                                   num_eval=0
-                                   )
+                                   subsample=subsample)
 
-            model.fit(x_train, y_train)
-            score[cv_i, cv_grid] = model.score(x_test, y_test)
+                model.fit(x_train, y_train)
+                score[cv_i, cv_grid, :] = model.score(x_test, y_test)
             if verbose:
                 ProgressBar(cv_grid/abs(len(grid)-1), barLen=len(grid))
 
     cv_result = pd.DataFrame(score)
     score = np.mean(score, axis=0)
     score_std = np.std(cv_result, axis=0)
-    best_score = np.amax(score) if type_of_target(
-        y) == 'multiclass' or 'binary' else np.amin(score)
-    score_std = np.amax(score_std) if type_of_target(
-        y) == 'multiclass' or 'binary' else np.amin(score_std)
+    best_score = np.amax(score) if classification is True else np.amin(score, axis=0)
+    score_std = np.amax(
+        score_std) if classification is True else np.amin(score_std)
     best_params = []
     for i, j in enumerate(np.where(score == best_score)[0]):
         best_params.append(grid[np.where(score == best_score)[0][i]])
@@ -84,5 +80,6 @@ def gridsearch(X, y, cv, random_state, path, param_grid, verbose):
     result = {}
     result['best_score'] = best_score
     result['score_std'] = score_std
-    pd.Series(result).to_csv('result.csv')
-    pd.DataFrame(best_params, index=['best_Params']).to_csv('best_parasm.csv')
+    pd.Series(result).to_csv(title + 'result.csv')
+    pd.Series(best_params, index=['best_Params']).to_csv(
+        title + 'best_parasm.csv')
