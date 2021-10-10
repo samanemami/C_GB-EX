@@ -28,23 +28,21 @@ class gbdt_mo(BaseEstimator):
         self.verbose = verbose
         self.num_eval = num_eval
 
+    def _model_complexity(self):
+        return self.training_time, self.memory
+
+
+class classification(gbdt_mo):
+
     def fit(self, X, y):
 
         if X.flags['C_CONTIGUOUS'] is False:
             X = np.ascontiguousarray(X, dtype=np.float64)
 
         X = X.astype('float64')
-
-        if type_of_target(y) == 'multiclass-multioutput' or 'continuous':
-            y = y.astype('float64')
-            n_class = y.shape[1]
-            loss = b"mse"
-        elif type_of_target(y) == 'multiclass' or 'binary':
-            y = y.astype('int32')
-            n_class = len(np.unique(y))
-            loss = b"ce"
-        else:
-            raise('Please indicate the type of target')
+        y = y.astype('int32')
+        n_class = len(np.unique(y))
+        loss = b"ce"
 
         LIB = load_lib(self.lib)
         params = {"max_depth": self.max_depth,
@@ -64,12 +62,6 @@ class gbdt_mo(BaseEstimator):
         self.memory = tracemalloc.get_traced_memory()[0]
         tracemalloc.clear_traces()
         return self
-
-    def _model_complexity(self):
-        return self.training_time, self.memory
-
-
-class classification(gbdt_mo):
 
     def predict_proba(self, X):
         return self.booster.predict(X, self.num_eval)
@@ -91,6 +83,35 @@ class classification(gbdt_mo):
 
 
 class regression(gbdt_mo):
+
+    def fit(self, X, y):
+
+        if X.flags['C_CONTIGUOUS'] is False:
+            X = np.ascontiguousarray(X, dtype=np.float64)
+
+        X = X.astype('float64')
+        y = y.astype('float64')
+        n_class = y.shape[1]
+        loss = b"mse"
+
+        LIB = load_lib(self.lib)
+        params = {"max_depth": self.max_depth,
+                  "lr": self.learning_rate,
+                  'loss': loss,
+                  "seed": self.random_state,
+                  "subsample": self.subsample,
+                  "verbose": self.verbose}
+
+        self.booster = GBDTMulti(LIB, out_dim=n_class, params=params)
+        self.booster.set_data((X, y))
+
+        tracemalloc.start()
+        t0 = process_time()
+        self.booster.train(self.num_boosters)
+        self.training_time = process_time() - t0
+        self.memory = tracemalloc.get_traced_memory()[0]
+        tracemalloc.clear_traces()
+        return self
 
     def predict(self, X):
         if X.flags['C_CONTIGUOUS'] is False:
