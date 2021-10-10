@@ -18,14 +18,14 @@ def ProgressBar(percent, barLen=20):
     sys.stdout.flush()
 
 
-def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, Classification):
+def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, clf):
 
     grid = [dict(zip(param_grid, v))
             for v in product(*param_grid.values())]
-    score = np.zeros((cv, len(grid))) if Classification is True else np.zeros(
+    score = np.zeros((cv, len(grid))) if clf else np.zeros(
         (cv, len(grid), y.shape[1]))
 
-    if Classification is True:
+    if clf:
         kfold = StratifiedKFold(n_splits=cv, shuffle=True,
                                 random_state=random_state)
 
@@ -42,7 +42,7 @@ def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, Classif
             learning_rate = (list(grid[cv_grid].values())[1])
             subsample = (list(grid[cv_grid].values())[2])
 
-            if Classification is True:
+            if clf:
 
                 model = classification(max_depth=max_depth,
                                        learning_rate=learning_rate,
@@ -67,15 +67,15 @@ def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, Classif
             if verbose:
                 ProgressBar(cv_grid/abs(len(grid)-1), barLen=len(grid))
 
-    cv_result = pd.DataFrame(score)
-    score = np.mean(score, axis=0)
-    score_std = np.std(cv_result, axis=0)
-    best_score = np.amax(score) if classification is True else np.amin(score, axis=0)
+
+    score_mean = np.mean(score, axis=0)
+    score_std = np.std(score, axis=0)
+    best_score = np.amax(score_mean) if clf else np.amin(score_mean, axis=0)
     score_std = np.amax(
-        score_std) if classification is True else np.amin(score_std)
+        score_std) if clf else np.amin(score_std)
     best_params = []
-    for i, j in enumerate(np.where(score == best_score)[0]):
-        best_params.append(grid[np.where(score == best_score)[0][i]])
+    for i, j in enumerate(np.where(score_mean == best_score)[0]):
+        best_params.append(grid[np.where(score_mean == best_score)[0][i]])
 
     result = {}
     result['mean_test_score'] = best_score
