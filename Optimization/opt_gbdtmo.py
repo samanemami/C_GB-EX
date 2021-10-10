@@ -78,8 +78,8 @@ def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, Classif
         best_params.append(grid[np.where(score == best_score)[0][i]])
 
     result = {}
-    result['best_score'] = best_score
-    result['score_std'] = score_std
+    result['mean_test_score'] = best_score
+    result['std_test_score'] = score_std
     pd.Series(result).to_csv(title + 'result.csv')
     pd.Series(best_params, index=['best_Params']).to_csv(
         title + 'best_parasm.csv')
