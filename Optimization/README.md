@@ -6,7 +6,7 @@ We defined an optimization class including cross-validation for each model and p
 
 
 ## C-GB, MART, TFBT
-The general [optimization](optimization.py) method for the `Condensed Gradient Boosted`, `MART`, `TFBT`, and `GBDT-MO` is the same. To use tune the hyperparameters for these models, simply run the following method. Note that the `scoring` function is different for classification and regression. This method serves for these three models and binary, multi-class classification, regression, and multi-output regression.
+The general [optimization](optimization.py) method for the `Condensed Gradient Boosted`, `MART`, `TFBT`, and `GBDT-MO` is the same. To use tune the hyperparameters for these models, simply run the following method. Note that the `scoring` function is different for classification, regression, and Multi-label classification. This method serves for these three models and binary, multi-class classification, regression, and multi-output regression.
 
 ```Python
 gridsearch(X=X, y=y,
