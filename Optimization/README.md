@@ -36,8 +36,16 @@ param_grid = {"max_depth": [2, 5, 10, 20],
 ```
 To tune the hyperparameters of the GBDT-MO, one can use this method as follows;
 ```Python
-gridsearch(X, y, cv, random_state, path, param_grid)
+gridsearch(X=X, y=y,
+           cv=2
+           random_state=1,
+           path='path.so',
+           param_grid=param_grid,
+           verbose=True,
+           verbose=True,
+           clf=True)
 ```
+The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
 Note this class ([opt_gbdtmo](https://github.com/samanemami/C_GB-EX/blob/main/Optimization/opt_gbdtmo.py)) only works for classification, multi-output regression, and GBDT-MO model with the mentioned grid. 
 
 ## Scoring function
