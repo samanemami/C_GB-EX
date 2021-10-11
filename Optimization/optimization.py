@@ -1,11 +1,9 @@
-""" Cross-validation method - Version 1.1
-    Last Sep Apr 2021 """
-
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from sklearn.utils.multiclass import type_of_target
-from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
+
+""" Cross-validation method """
 
 
 def gridsearch(X, y, model, grid,
@@ -15,21 +13,26 @@ def gridsearch(X, y, model, grid,
                random_state=None,
                n_cv_general=10,
                n_cv_intrain=10,
-               train_score=False,
-               save_results=True):
+               clf=True,
+               title=None):
 
     cv_results_test = np.zeros((n_cv_general, 1))
     cv_results_generalization = np.zeros((n_cv_general, 1))
     best_index_time = np.zeros((n_cv_general, 2))
     pred = np.zeros_like(y)
-    err = np.zeros((n_cv_general, y.shape[1]))
-    best_estimator = []
     bestparams = []
     cv_results = []
+    if not clf:
+        err = np.zeros((n_cv_general, y.shape[1]))
 
-    kfold_gen = KFold(n_splits=n_cv_general,
-                      random_state=random_state,
-                      shuffle=True)
+    if clf:
+        kfold_gen = StratifiedKFold(n_splits=n_cv_general,
+                                    shuffle=True,
+                                    random_state=random_state)
+    else:
+        kfold_gen = KFold(n_splits=n_cv_general,
+                          random_state=random_state,
+                          shuffle=True)
 
     # k Fold cross-validation
 
@@ -37,12 +40,17 @@ def gridsearch(X, y, model, grid,
         x_train, x_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
 
-        kfold = KFold(n_splits=n_cv_intrain,
-                      random_state=random_state,
-                      shuffle=True)
+        if clf:
+            kfold = StratifiedKFold(n_splits=n_cv_intrain,
+                                    shuffle=True,
+                                    random_state=random_state)
+        else:
+            kfold = KFold(n_splits=n_cv_intrain,
+                          random_state=random_state,
+                          shuffle=True)
 
         estimator = model if pipeline is None else Pipeline(
-            [pipeline, ('reg', model)])
+            [pipeline, ('clf', model)])
 
         # Finding optimum hyper-parameter
 
@@ -50,17 +58,17 @@ def gridsearch(X, y, model, grid,
                                    cv=kfold,
                                    scoring=scoring_functions,
                                    refit=best_scoring,
-                                   return_train_score=train_score)
+                                   return_train_score=False,
+                                   )
 
         grid_search.fit(x_train, y_train)
 
-        pred[test_index] = grid_search.predict(x_test)
-        err[cv_i, :] = np.sqrt(np.average(
-            (y_test - pred[test_index])**2, axis=0))
+        if clf is False:
+            pred[test_index] = grid_search.predict(x_test)
+            err[cv_i, :] = np.sqrt(np.average(
+                (y_test - pred[test_index])**2, axis=0))
 
         bestparams.append(grid_search.best_params_)
-
-        best_estimator.append(grid_search.best_estimator_)
 
         grid_search.cv_results_[
             'final_test_error'] = grid_search.score(x_test, y_test)
@@ -96,13 +104,14 @@ def gridsearch(X, y, model, grid,
     results['std_scoret_time'] = np.std(
         best_index_time[:, 1], axis=0)
 
-    if (save_results == True):
-        pd.DataFrame(results).to_csv('Summary-r2.csv')
-        pd.DataFrame(cv_results).to_csv('CV_results.csv')
-        pd.DataFrame(bestparams).to_csv('Best_Parameters.csv')
-        pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
-            'Best_Index_time.csv')
+    pd.DataFrame(results).to_csv(title + '- Summary.csv')
+    pd.DataFrame(cv_results).to_csv(title + '- CV_results.csv')
+    pd.DataFrame(bestparams).to_csv(title + '- Best_Parameters.csv')
+    pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
+        title + '- Best_Index_time.csv')
+
+    if not clf:
         rmse = {}
         rmse['mean-RMSE'] = np.mean(err, axis=0)
         rmse['std-RMSE'] = np.std(err, axis=0)
-        pd.DataFrame(rmse).to_csv('RMSE.csv')
+        pd.DataFrame(rmse).to_csv(title + '- RMSE.csv')
