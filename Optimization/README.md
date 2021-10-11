@@ -24,6 +24,8 @@ gridsearch(X=X, y=y,
 ```
 The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
 
+Note that the `scoring_functions` for `Multi_output regressio`n and `Multi-label classification` must be `r2` for ranking purposes. The model will return the `RMSE` for each output
+
 ## GBDT-MO
 Due to the high memory usage of the `GBDT-MO` model for some datasets, we defined a customized gridsearch only for this model, which consumes less memory than other methods such as gridsearchCV.
 The [opt_gbdtmo](https://github.com/samanemami/C_GB-EX/blob/main/Optimization/opt_gbdtmo.py) method, manage the gridsearchCV for the GBDT-MO model with the following param_grid;
