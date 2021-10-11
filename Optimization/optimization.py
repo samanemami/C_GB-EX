@@ -1,7 +1,23 @@
+import sys
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
+
+""" ProgressBar """
+
+
+def ProgressBar(percent, barLen=20):
+    sys.stdout.write("\r")
+    progress = ""
+    for i in range(barLen):
+        if i < int(barLen * percent):
+            progress += "="
+        else:
+            progress += " "
+    sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
+    sys.stdout.flush()
+
 
 """ Cross-validation method """
 
@@ -13,6 +29,7 @@ def gridsearch(X, y, model, grid,
                random_state=None,
                n_cv_general=10,
                n_cv_intrain=10,
+               verbose=False,
                clf=True,
                title=None):
 
@@ -23,7 +40,11 @@ def gridsearch(X, y, model, grid,
     bestparams = []
     cv_results = []
     if not clf:
-        err = np.zeros((n_cv_general, y.shape[1]))
+        try:
+            if y.shape[1] > 1:
+                err = np.zeros((n_cv_general, y.shape[1]))
+        except:
+            pass
 
     if clf:
         kfold_gen = StratifiedKFold(n_splits=n_cv_general,
@@ -64,9 +85,13 @@ def gridsearch(X, y, model, grid,
         grid_search.fit(x_train, y_train)
 
         if clf is False:
-            pred[test_index] = grid_search.predict(x_test)
-            err[cv_i, :] = np.sqrt(np.average(
-                (y_test - pred[test_index])**2, axis=0))
+            try:
+                if y.shape[1] > 1:
+                    pred[test_index] = grid_search.predict(x_test)
+                    err[cv_i, :] = np.sqrt(np.average(
+                        (y_test - pred[test_index])**2, axis=0))
+            except:
+                pass
 
         bestparams.append(grid_search.best_params_)
 
@@ -83,6 +108,9 @@ def gridsearch(X, y, model, grid,
             'mean_fit_time'][grid_search.best_index_]
         best_index_time[cv_i, 1] = grid_search.cv_results_[
             'mean_score_time'][grid_search.best_index_]
+
+        if verbose:
+            ProgressBar(cv_i/abs((n_cv_general)-1), barLen=n_cv_general)
 
     results = {}
     results['Metric'] = [
@@ -110,8 +138,10 @@ def gridsearch(X, y, model, grid,
     pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
         title + '- Best_Index_time.csv')
 
-    if not clf:
+    try:
         rmse = {}
         rmse['mean-RMSE'] = np.mean(err, axis=0)
         rmse['std-RMSE'] = np.std(err, axis=0)
         pd.DataFrame(rmse).to_csv(title + '- RMSE.csv')
+    except:
+        print('\n', 'The search has finished successfully')
