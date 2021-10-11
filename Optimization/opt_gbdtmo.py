@@ -71,7 +71,7 @@ def gridsearch(X, y, cv, random_state, path, param_grid, verbose, clf):
     score_std = np.std(score, axis=0)
     best_score = np.amax(score_mean) if clf else np.amin(score_mean, axis=0)
     score_std = np.amax(
-        score_std) if clf else np.amin(score_std)
+        score_std) if clf else np.amin(score_std, axis=0)
     best_params = []
     for i, j in enumerate(np.where(score_mean == best_score)[0]):
         best_params.append(grid[np.where(score_mean == best_score)[0][i]])
