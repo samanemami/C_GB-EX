@@ -18,7 +18,7 @@ def ProgressBar(percent, barLen=20):
     sys.stdout.flush()
 
 
-def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, clf):
+def gridsearch(X, y, cv, random_state, path, param_grid, verbose, clf):
 
     grid = [dict(zip(param_grid, v))
             for v in product(*param_grid.values())]
@@ -67,7 +67,6 @@ def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, clf):
             if verbose:
                 ProgressBar(cv_grid/abs(len(grid)-1), barLen=len(grid))
 
-
     score_mean = np.mean(score, axis=0)
     score_std = np.std(score, axis=0)
     best_score = np.amax(score_mean) if clf else np.amin(score_mean, axis=0)
@@ -80,6 +79,8 @@ def gridsearch(X, y, cv, random_state, path, param_grid, title, verbose, clf):
     result = {}
     result['mean_test_score'] = best_score
     result['std_test_score'] = score_std
-    pd.Series(result).to_csv(title + 'result.csv')
-    pd.Series(best_params, index=['best_Params']).to_csv(
-        title + 'best_parasm.csv')
+    pd.Series(result).to_csv('result.csv')
+    index = []
+    for i in range(len(best_params)):
+        index.append('split -' + str(i))
+    pd.DataFrame(best_params, index=index).to_csv('best_parasm.csv')
