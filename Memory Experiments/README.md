@@ -29,3 +29,5 @@ After installing memory_profiler, you may run `python -m memory_profiler_example
 To install and plot a memory usage with the profiler, refer to this [library](https://pypi.org/project/memory-profiler/).
 Also, if you run `mprof run memory_profiler_example.py` and then `mprof plot`, you will have a memory usage trend.
 After running `mprof run memory_profiler_example.py` [memory_profiler_example](memory_profiler_example.py), it gives you a [dat](https://github.com/samanemami/C_GB-EX/blob/main/Memory%20Experiments/mprofile_20211005101227.dat) file regarding the consumed memory.
+
+If you want to plot all calculated memory together (after running the `mprof run scripy.py`), you can use the [plot_mprofile.py](plot_mprofile.py) method. This method will print plots of the `mprofile.dat` for each model. To work with this file, you have to consider the outputs of `mprof run scripy.py` as an input of this method. If you want to have a clean plot, we recommend renaming your dat file to the name of each model.
