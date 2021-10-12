@@ -1,3 +1,5 @@
+![![memory](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg)
+
 # Memory experiments
 
 For memory consumptions, we considered different profilers and libraries to have robust and reliable results.
