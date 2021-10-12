@@ -1,4 +1,4 @@
-![![memory](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.png)](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.png)
+![![memory](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg)
 
 # Memory experiments
 
