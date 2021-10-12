@@ -1,5 +1,3 @@
-![![memory](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg)
-
 <p align="center">
   <img src="https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg">
 </p>
