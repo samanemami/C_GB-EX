@@ -10,8 +10,7 @@ The methods used to calculate the consumed memory are as follows;
 <ul>
   <li> tracemalloc </li>
   <li> memory_profiler </li>
-  <li> psutil </li>
-
+</ul>
 
 
 There is an example of each method in this directory.
