@@ -16,9 +16,9 @@ cv = 5
 path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
 LIB = load_lib(path)
 
-param_grid = {"max_depth": [2, 5],
-              "learning_rate": [0.025, 0.05],
-              "subsample": [0.75, ]}
+param_grid = {"max_depth": [2, 5, 10, 20],
+              "learning_rate": [0.025, 0.05, 0.1, 0.5, 1],
+              "subsample": [0.75, 0.5, 1]}
 
 
 def ProgressBar(percent, barLen=20):
