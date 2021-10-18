@@ -46,7 +46,10 @@ gridsearch(X=X, y=y,
            clf=True)
 ```
 The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
-Note this class ([opt_gbdtmo](https://github.com/samanemami/C_GB-EX/blob/main/Optimization/opt_gbdtmo.py)) only works for classification, multi-output regression, and GBDT-MO model with the mentioned grid. 
+Note this class ([Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py)) only works for classification, multi-output regression, and GBDT-MO model with the mentioned grid. 
+
+This gridsearch is designed to work only for the wrapper of GBDT-MO, if you want to do the grid search without using the wrapper, please refer to the [optimize_gbdtmo](optimize_gbdtmo).
+
 
 ## Scoring function
 The scoring we used for different problems to find a better grid are as follows;
