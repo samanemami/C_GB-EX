@@ -15,7 +15,10 @@ class gbdt_mo(BaseEstimator):
                  num_boosters=30,
                  subsample=1.0,
                  verbose=False,
-                 num_eval=0
+                 num_eval=0,
+                 max_bins=8,
+                 min_samples=16,
+                 gamma=1e-3
                  ):
 
         self.max_depth = max_depth
@@ -26,6 +29,9 @@ class gbdt_mo(BaseEstimator):
         self.subsample = subsample
         self.verbose = verbose
         self.num_eval = num_eval
+        self.max_bins = max_bins
+        self.min_samples = min_samples
+        self.gamma = gamma
 
     def _model_complexity(self):
         return self.training_time, self.memory
@@ -50,9 +56,9 @@ class classification(gbdt_mo):
                   "seed": self.random_state,
                   "subsample": self.subsample,
                   "verbose": self.verbose,
-                  "max_bins": 8,
-                  "min_samples": 16,
-                  "gamma": 1e-3}
+                  "max_bins": self.max_bins,
+                  "min_samples": self.min_samples,
+                  "gamma": self.gamma}
 
         self.booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         self.booster.set_data((X, y))
@@ -103,9 +109,9 @@ class regression(gbdt_mo):
                   "seed": self.random_state,
                   "subsample": self.subsample,
                   "verbose": self.verbose,
-                  "max_bins": 8,
-                  "min_samples": 16,
-                  "gamma": 1e-3}
+                  "max_bins": self.max_bins,
+                  "min_samples": self.min_samples,
+                  "gamma": self.gamma}
 
         self.booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         self.booster.set_data((X, y))
