@@ -49,7 +49,10 @@ class classification(gbdt_mo):
                   'loss': loss,
                   "seed": self.random_state,
                   "subsample": self.subsample,
-                  "verbose": self.verbose}
+                  "verbose": self.verbose,
+                  "max_bins": 8,
+                  "min_samples": 16,
+                  "gamma": 1e-3}
 
         self.booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         self.booster.set_data((X, y))
@@ -99,7 +102,10 @@ class regression(gbdt_mo):
                   'loss': loss,
                   "seed": self.random_state,
                   "subsample": self.subsample,
-                  "verbose": self.verbose}
+                  "verbose": self.verbose,
+                  "max_bins": 8,
+                  "min_samples": 16,
+                  "gamma": 1e-3}
 
         self.booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         self.booster.set_data((X, y))
