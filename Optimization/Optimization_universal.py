@@ -171,7 +171,7 @@ def gridsearch(X, y, model, grid,
     pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
         title + '- Best_Index_time.csv')
     try:
-        pd.DataFrame(pred).to_csv(title + '-predicted_values.csv')
+        np.savetxt(title + '-predicted_values.csv', pred, delimiter=',')
     except:
         pass
     try:
