@@ -33,7 +33,7 @@ def gridsearch(X, y, model, grid,
                verbose=False,
                clf=True,
                metric=None,
-               title=None):
+               title='none'):
     '''Python
         scoring_functions: str, callable, list, tuple or dict, default=None
                             Strategy for ranking the splits of the cross-validated model
