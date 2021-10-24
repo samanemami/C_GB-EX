@@ -56,9 +56,10 @@ def gridsearch(X, y, model, grid,
     cv_results_test = np.zeros((n_cv_general, 1))
     cv_results_generalization = np.zeros((n_cv_general, 1))
     best_index_time = np.zeros((n_cv_general, 2))
-    pred = np.zeros_like(y)
     bestparams = []
     cv_results = []
+    err = np.zeros((n_cv_general, y.shape[1]))
+    pred = np.zeros_like(y)
 
     if clf:
         kfold_gen = StratifiedKFold(n_splits=n_cv_general,
@@ -98,26 +99,24 @@ def gridsearch(X, y, model, grid,
 
         grid_search.fit(x_train, y_train)
 
+        try:
+            pred[test_index] = grid_search.predict(x_test)
+        except:
+            pass
+
         # Calculate the score for multivariate regression tasks
         if clf is False:
             try:
                 if y.shape[1] > 1:
-                    pred[test_index] = grid_search.predict(x_test)
-                    err = np.zeros((n_cv_general, y.shape[1]))
                     if metric == 'rmse':
                         err[cv_i, :] = np.sqrt(np.average(
                             (y_test - pred[test_index])**2, axis=0))
                     elif metric == 'euclidean':
                         for i in range(y.shape[1]):
-                            err[cv_i, :] = distance.euclidean(
-                                y[:, i], pred[:, i])
+                            err[cv_i, i] = distance.euclidean(
+                                y_test[:, i], pred[test_index, i])
             except:
                 pass
-
-        try:
-            pred[test_index] = grid_search.predict(x_test)
-        except:
-            pass
 
         bestparams.append(grid_search.best_params_)
 
@@ -158,17 +157,21 @@ def gridsearch(X, y, model, grid,
     results['std_scoret_time'] = np.std(
         best_index_time[:, 1], axis=0)
 
-    pd.DataFrame(results).to_csv(title + '- Summary.csv')
-    pd.DataFrame(cv_results).to_csv(title + '- CV_results.csv')
-    pd.DataFrame(bestparams).to_csv(title + '- Best_Parameters.csv')
+    pd.DataFrame(results).to_csv(
+        title + ' ' + scoring_functions + '- Summary.csv')
+    pd.DataFrame(cv_results).to_csv(
+        title + ' ' + scoring_functions + '- CV_results.csv')
+    pd.DataFrame(bestparams).to_csv(
+        title + ' ' + scoring_functions + '- Best_Parameters.csv')
     pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
         title + '- Best_Index_time.csv')
 
     try:
         reg_score = {}
-        reg_score['mean' + metric] = np.mean(err, axis=0)
-        reg_score['std' + metric] = np.std(err, axis=0)
-        pd.DataFrame(reg_score).to_csv(title + metric + '-score.csv')
+        reg_score['mean ' + metric] = np.mean(err, axis=0)
+        reg_score['std ' + metric] = np.std(err, axis=0)
+        pd.DataFrame(reg_score).to_csv(title + ' ' + metric + ' score.csv')
         pd.DataFrame(pred).to_csv(title + '-predicted_values.csv')
+        pd.DataFrame(err).to_csv(title + ' ' + metric + 'report.csv')
     except:
         print('\n', 'The search has finished successfully')
