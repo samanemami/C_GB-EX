@@ -114,6 +114,11 @@ def gridsearch(X, y, model, grid,
             except:
                 pass
 
+        try:
+            pred[test_index] = grid_search.predict(x_test)
+        except:
+            pass
+
         bestparams.append(grid_search.best_params_)
 
         grid_search.cv_results_[
