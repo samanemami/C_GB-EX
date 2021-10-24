@@ -58,8 +58,13 @@ def gridsearch(X, y, model, grid,
     best_index_time = np.zeros((n_cv_general, 2))
     bestparams = []
     cv_results = []
-    err = np.zeros((n_cv_general, y.shape[1]))
     pred = np.zeros_like(y)
+    if clf is False:
+        try:
+            if y.shape[1] > 1:
+                err = np.zeros((n_cv_general, y.shape[1]))
+        except:
+            pass
 
     if clf:
         kfold_gen = StratifiedKFold(n_splits=n_cv_general,
@@ -165,13 +170,15 @@ def gridsearch(X, y, model, grid,
         title + ' ' + scoring_functions + '- Best_Parameters.csv')
     pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
         title + '- Best_Index_time.csv')
-
+    try:
+        pd.DataFrame(pred).to_csv(title + '-predicted_values.csv')
+    except:
+        pass
     try:
         reg_score = {}
         reg_score['mean ' + metric] = np.mean(err, axis=0)
         reg_score['std ' + metric] = np.std(err, axis=0)
         pd.DataFrame(reg_score).to_csv(title + ' ' + metric + ' score.csv')
-        pd.DataFrame(pred).to_csv(title + '-predicted_values.csv')
-        pd.DataFrame(err).to_csv(title + ' ' + metric + 'report.csv')
+        pd.DataFrame(err).to_csv(title + ' ' + metric + ' report.csv')
     except:
         print('\n', 'The search has finished successfully')
