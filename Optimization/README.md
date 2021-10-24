@@ -20,7 +20,7 @@ gridsearch(X=X, y=y,
            n_cv_intrain=2,
            verbose=True,
            clf=True,
-           metric=None
+           metric=None,
            title='Dataset')
 
 
@@ -48,7 +48,7 @@ gridsearch(X=X, y=y,
                             if metric is 'euclidean' then, it returns the euclidean distance as a score
                             if metric is 'rmse' then, it returns the rmse as a score 
 
-    '''
+'''
 ```
 
 The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
