@@ -20,11 +20,42 @@ gridsearch(X=X, y=y,
            n_cv_intrain=2,
            verbose=True,
            clf=True,
+           metric=None
            title='Dataset')
+
+
+'''Python
+        scoring_functions: str, callable, list, tuple or dict, default=None
+                            Strategy for ranking the splits of the cross-validated model
+
+        best_scoring: bool , default=None
+                            using the best-found parameters
+
+        n_cv_general: int, default=10
+                            n-folds of the cross-validation 
+
+        n_cv_intrain: int, default=10
+                            int, to specify the number of folds in a `(Stratified)KFold`
+
+        verbose: bool, default=False
+                            if verbose then retrun the progress of the search
+
+        clf: bool, default=True
+                            if verbose then, return the progress of the search
+
+        metric: str, default=None
+                            Use if the clf is False
+                            if metric is 'euclidean' then, it returns the euclidean distance as a score
+                            if metric is 'rmse' then, it returns the rmse as a score 
+
+    '''
 ```
+
 The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
 
 Note that the `scoring_functions` for `Multi_output regressio`n and `Multi-label classification` must be `r2` for ranking purposes. The model will return the `RMSE` for each output
+
+The metric `euclidean` was added to consider the noisy and extreme value for multivariate regression problems.
 
 ## GBDT-MO
 Due to the high memory usage of the `GBDT-MO` model for some datasets, we defined a customized gridsearch only for this model, which consumes less memory than other methods such as gridsearchCV.
