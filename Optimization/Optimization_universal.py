@@ -37,27 +37,20 @@ def gridsearch(X, y, model, grid,
     '''Python
         scoring_functions: str, callable, list, tuple or dict, default=None
                             Strategy for ranking the splits of the cross-validated model
-
         best_scoring: bool , default=None
                             using the best-found parameters
-
         n_cv_general: int, default=10
                             n-folds of the cross-validation 
-
         n_cv_intrain: int, default=10
                             int, to specify the number of folds in a `(Stratified)KFold`
-
         verbose: bool, default=False
                             if verbose then retrun the progress of the search
-
         clf: bool, default=True
                             if verbose then, return the progress of the search
-
         metric: str, default=None
                             Use if the clf is False
                             if metric is 'euclidean' then, it returns the euclidean distance as a score
                             if metric is 'rmse' then, it returns the rmse as a score 
-
     '''
 
     cv_results_test = np.zeros((n_cv_general, 1))
@@ -109,13 +102,12 @@ def gridsearch(X, y, model, grid,
         if clf is False:
             try:
                 if y.shape[1] > 1:
+                    pred[test_index] = grid_search.predict(x_test)
+                    err = np.zeros((n_cv_general, y.shape[1]))
                     if metric == 'rmse':
-                        err = np.zeros((n_cv_general, y.shape[1]))
-                        pred[test_index] = grid_search.predict(x_test)
                         err[cv_i, :] = np.sqrt(np.average(
                             (y_test - pred[test_index])**2, axis=0))
                     elif metric == 'euclidean':
-                        err = np.zeros((n_cv_general, y.shape[1]))
                         for i in range(y.shape[1]):
                             err[cv_i, :] = distance.euclidean(
                                 y[:, i], pred[:, i])
@@ -172,5 +164,6 @@ def gridsearch(X, y, model, grid,
         reg_score['mean' + metric] = np.mean(err, axis=0)
         reg_score['std' + metric] = np.std(err, axis=0)
         pd.DataFrame(reg_score).to_csv(title + metric + '-score.csv')
+        pd.DataFrame(pred).to_csv(title + '-predicted_values.csv')
     except:
         print('\n', 'The search has finished successfully')
