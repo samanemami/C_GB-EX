@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import pandas as pd
+from scipy.spatial import distance
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
 
@@ -31,7 +32,33 @@ def gridsearch(X, y, model, grid,
                n_cv_intrain=10,
                verbose=False,
                clf=True,
+               metric=None,
                title=None):
+    '''Python
+        scoring_functions: str, callable, list, tuple or dict, default=None
+                            Strategy for ranking the splits of the cross-validated model
+
+        best_scoring: bool , default=None
+                            using the best-found parameters
+
+        n_cv_general: int, default=10
+                            n-folds of the cross-validation 
+
+        n_cv_intrain: int, default=10
+                            int, to specify the number of folds in a `(Stratified)KFold`
+
+        verbose: bool, default=False
+                            if verbose then retrun the progress of the search
+
+        clf: bool, default=True
+                            if verbose then, return the progress of the search
+
+        metric: str, default=None
+                            Use if the clf is False
+                            if metric is 'euclidean' then, it returns the euclidean distance as a score
+                            if metric is 'rmse' then, it returns the rmse as a score 
+
+    '''
 
     cv_results_test = np.zeros((n_cv_general, 1))
     cv_results_generalization = np.zeros((n_cv_general, 1))
@@ -39,12 +66,6 @@ def gridsearch(X, y, model, grid,
     pred = np.zeros_like(y)
     bestparams = []
     cv_results = []
-    if not clf:
-        try:
-            if y.shape[1] > 1:
-                err = np.zeros((n_cv_general, y.shape[1]))
-        except:
-            pass
 
     if clf:
         kfold_gen = StratifiedKFold(n_splits=n_cv_general,
@@ -84,12 +105,20 @@ def gridsearch(X, y, model, grid,
 
         grid_search.fit(x_train, y_train)
 
+        # Calculate the score for multivariate regression tasks
         if clf is False:
             try:
                 if y.shape[1] > 1:
-                    pred[test_index] = grid_search.predict(x_test)
-                    err[cv_i, :] = np.sqrt(np.average(
-                        (y_test - pred[test_index])**2, axis=0))
+                    if metric == 'rmse':
+                        err = np.zeros((n_cv_general, y.shape[1]))
+                        pred[test_index] = grid_search.predict(x_test)
+                        err[cv_i, :] = np.sqrt(np.average(
+                            (y_test - pred[test_index])**2, axis=0))
+                    elif metric == 'euclidean':
+                        err = np.zeros((n_cv_general, y.shape[1]))
+                        for i in range(y.shape[1]):
+                            err[cv_i, :] = distance.euclidean(
+                                y[:, i], pred[:, i])
             except:
                 pass
 
@@ -139,9 +168,9 @@ def gridsearch(X, y, model, grid,
         title + '- Best_Index_time.csv')
 
     try:
-        rmse = {}
-        rmse['mean-RMSE'] = np.mean(err, axis=0)
-        rmse['std-RMSE'] = np.std(err, axis=0)
-        pd.DataFrame(rmse).to_csv(title + '- RMSE.csv')
+        reg_score = {}
+        reg_score['mean' + metric] = np.mean(err, axis=0)
+        reg_score['std' + metric] = np.std(err, axis=0)
+        pd.DataFrame(reg_score).to_csv(title + metric + '-score.csv')
     except:
         print('\n', 'The search has finished successfully')
