@@ -48,9 +48,9 @@ def gridsearch(X, y, model, grid,
         clf: bool, default=True
                             if verbose then, return the progress of the search
         metric: str, default=None
-                            Use if the clf is False
-                            if metric is 'euclidean' then, it returns the euclidean distance as a score
-                            if metric is 'rmse' then, it returns the rmse as a score 
+                            Use if the clf is False and the regression is multioutput.
+                                -   if metric is 'euclidean' then, it returns the euclidean distance as a score
+                                -   if metric is 'rmse' then, it returns the rmse as a score 
     '''
 
     cv_results_test = np.zeros((n_cv_general, 1))
