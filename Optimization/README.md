@@ -43,10 +43,11 @@ gridsearch(X=X, y=y,
         clf: bool, default=True
                             if verbose then, return the progress of the search
 
-        metric: str, default=None
-                            if clf is Flase and type_of_target =='multi-output':
+        metric: str, {'euclidean', 'rmse'} default=None
+                            if clf is Flase:
                                        if metric is 'euclidean': score = euclidean distance
                                        if metric is 'rmse': score = rmse
+                            
 
 '''
 ```
