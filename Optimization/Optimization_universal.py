@@ -183,13 +183,12 @@ def gridsearch(X, y, model, grid,
         title + '- Best_Index_time.csv')
     try:
         np.savetxt(title + '-predicted_values.csv', pred, delimiter=',')
-    except:
-        pass
-    try:
         reg_score = {}
         reg_score['mean ' + metric] = np.mean(err, axis=0)
         reg_score['std ' + metric] = np.std(err, axis=0)
-        pd.DataFrame(reg_score).to_csv(title + ' ' + metric + ' score.csv')
-        pd.DataFrame(err).to_csv(title + ' ' + metric + ' report.csv')
+        pd.DataFrame(reg_score, index=['target-' + str(i) for i in range(y.shape[1])]).to_csv(
+            title + ' ' + metric + ' score.csv')
+        pd.DataFrame(err, index=['split-' + str(i) for i in range(n_cv_general)]
+                     ).to_csv(title + ' ' + metric + ' report.csv')
     except:
-        print('\n', 'The search has finished successfully')
+        pass
