@@ -114,14 +114,22 @@ def gridsearch(X, y, model, grid,
         # Calculate the score for multivariate regression tasks
         if clf is False:
             try:
-                if y.shape[1] > 1:
-                    if metric == 'rmse':
-                        err[cv_i, :] = np.sqrt(np.average(
+                if metric == 'rmse':
+                    if y.shape[1] > 1:
+                        output_errors = np.sqrt(np.average(
                             (y_test - pred[test_index])**2, axis=0))
-                    elif metric == 'euclidean':
+                        err[cv_i, :] = output_errors
+                    else:
+                        err[cv_i, ] = output_errors
+
+                elif metric == 'euclidean':
+                    if y.shape[1] > 1:
                         for i in range(y.shape[1]):
                             err[cv_i, i] = distance.euclidean(
                                 y_test[:, i], pred[test_index, i])
+                    else:
+                        err[cv_i, ] = distance.euclidean(
+                            y_test, pred[test_index])
             except:
                 pass
 
