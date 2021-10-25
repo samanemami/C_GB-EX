@@ -63,6 +63,8 @@ def gridsearch(X, y, model, grid,
         try:
             if y.shape[1] > 1:
                 err = np.zeros((n_cv_general, y.shape[1]))
+            else:
+                err = np.zeros((n_cv_general,))
         except:
             pass
 
