@@ -124,13 +124,8 @@ def gridsearch(X, y, model, grid,
                         err[cv_i, ] = output_errors
 
                 elif metric == 'euclidean':
-                    if y.shape[1] > 1:
-                        for i in range(y.shape[1]):
-                            err[cv_i, i] = distance.euclidean(
-                                y_test[:, i], pred[test_index, i])
-                    else:
-                        err[cv_i, ] = distance.euclidean(
-                            y_test, pred[test_index])
+                    err = np.zeros((n_cv_general,))
+                    err[cv_i, ] = np.mean(np.sqrt(np.power(y - pred, 2).sum(axis=1)))
             except:
                 pass
 
