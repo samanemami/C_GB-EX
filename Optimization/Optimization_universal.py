@@ -59,10 +59,11 @@ def gridsearch(X, y, model, grid,
     best_index_time = np.zeros((n_cv_general, 2))
     bestparams = []
     cv_results = []
-    pred = np.zeros_like(y)
+    pred = np.zeros((y.shape[0], ))
     if clf is False:
         try:
             if y.shape[1] > 1:
+                pred = np.zeros_like(y)
                 err = np.zeros((n_cv_general, y.shape[1]))
                 if metric == 'euclidean':
                     err = np.zeros((n_cv_general,))
