@@ -40,7 +40,7 @@ def gridsearch(X, y, model, grid,
         best_scoring: bool , default=None
                             using the best-found parameters
         n_cv_general: int, default=10
-                            n-folds of the cross-validation 
+                            n-folds of the cross-validation
         n_cv_intrain: int, default=10
                             int, to specify the number of folds in a `(Stratified)KFold`
         verbose: bool, default=False
@@ -64,8 +64,11 @@ def gridsearch(X, y, model, grid,
         try:
             if y.shape[1] > 1:
                 err = np.zeros((n_cv_general, y.shape[1]))
+                if metric == 'euclidean':
+                    err = np.zeros((n_cv_general,))
             else:
                 err = np.zeros((n_cv_general,))
+
         except:
             pass
 
@@ -98,6 +101,7 @@ def gridsearch(X, y, model, grid,
 
         # Finding optimum hyper-parameter
 
+        # For multivariate regression tasks, set the scoring to 'r2'
         grid_search = GridSearchCV(estimator, grid,
                                    cv=kfold,
                                    scoring=scoring_functions,
@@ -124,8 +128,8 @@ def gridsearch(X, y, model, grid,
                         err[cv_i, ] = output_errors
 
                 elif metric == 'euclidean':
-                    err = np.zeros((n_cv_general,))
-                    err[cv_i, ] = np.mean(np.sqrt(np.power(y - pred, 2).sum(axis=1)))
+                    err[cv_i, ] = np.mean(
+                        np.sqrt(np.power(y - pred, 2).sum(axis=1)))
             except:
                 pass
 
@@ -181,7 +185,7 @@ def gridsearch(X, y, model, grid,
         reg_score = {}
         reg_score['mean ' + metric] = np.mean(err, axis=0)
         reg_score['std ' + metric] = np.std(err, axis=0)
-        pd.DataFrame(reg_score, index=['target-' + str(i) for i in range(y.shape[1])]).to_csv(
+        pd.DataFrame(reg_score, index=[list('target-' + str(i) for i in range(y.shape[1])) if metric == 'rmse' else 'Distance']).to_csv(
             title + ' ' + metric + ' score.csv')
         pd.DataFrame(err, index=['split-' + str(i) for i in range(n_cv_general)]
                      ).to_csv(title + ' ' + metric + ' report.csv')
