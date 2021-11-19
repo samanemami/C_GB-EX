@@ -66,9 +66,6 @@ def gridsearch(X, y, model, grid,
                 err = np.zeros((n_cv_general, y.shape[1]))
                 if metric == 'euclidean':
                     err = np.zeros((n_cv_general,))
-            else:
-                err = np.zeros((n_cv_general,))
-
         except:
             pass
 
