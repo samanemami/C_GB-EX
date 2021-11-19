@@ -69,7 +69,7 @@ def opt(cv=2, T=100, random_state=1, loss=b"ce", title='title'):
         score[cv_i, ] = accuracy_score(y_test, np.argmax(
             booster.predict(x_test), axis=1))
 
-    np.savetxt(title + 'score.csv', score, fmt='%.2f', delimiter=',')
+    np.savetxt(title + 'score.csv', score, delimiter=',')
 
 
 if __name__ == '__main__':
