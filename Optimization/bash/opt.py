@@ -19,14 +19,20 @@ def convert(arg):
     return arg
 
 
-def opt(cv=2, T=100, random_state=1, loss=b"ce"):
+def opt(cv=2, T=100, random_state=1, loss=b"ce", title='title'):
 
-    acc = []
-    path = '/lustre/home/samanema/.local/lib/python3.6/site-packages/gbdtmo/build/gbdtmo.so'
+    score = np.zeros((cv, ))
+    path = '~/.local/lib/python3.6/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
 
-    kfold = StratifiedKFold(n_splits=cv, shuffle=True,
-                            random_state=random_state)
+    if loss == b"ce":
+        kfold = StratifiedKFold(n_splits=cv, shuffle=True,
+                                random_state=random_state)
+        n_class = len(np.unique(y))
+    else:
+        kfold = KFold(n_splits=cv, shuffle=False,
+                      random_state=random_state)
+        n_class = y.shape[1]
 
     lr = float(convert(sys.argv[1]))
     depth = int(convert(sys.argv[2]))
@@ -35,7 +41,7 @@ def opt(cv=2, T=100, random_state=1, loss=b"ce"):
     params = {"max_depth": depth, "lr": lr, 'loss': loss,
               'verbose': False, 'subsample': 1.0}
 
-    booster = GBDTMulti(LIB, out_dim=len(np.unique(y)), params=params)
+    booster = GBDTMulti(LIB, out_dim=n_class, params=params)
     for cv_i, (train_index, test_index) in enumerate(kfold.split(X, y)):
         x_train, x_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
@@ -56,17 +62,20 @@ def opt(cv=2, T=100, random_state=1, loss=b"ce"):
             booster.set_data((x_train, y_train))
             booster.train(T)
 
-            acc.append(accuracy_score(y_test, np.argmax(
-                booster.predict(x_test), axis=1)))
         else:
             booster.set_data((x_train, y_train))
             booster.train(T)
 
-            acc.append(accuracy_score(y_test, np.argmax(
-                booster.predict(x_test), axis=1)))
+        score[cv_i, ] = accuracy_score(y_test, np.argmax(
+            booster.predict(x_test), axis=1))
 
-    return acc
+    np.savetxt(title + 'score.csv', score, fmt='%.2f', delimiter=',')
 
 
 if __name__ == '__main__':
-    opt(cv=2, T=100, random_state=1, loss=b"ce")
+
+    opt(cv=2,
+        T=100,
+        random_state=1,
+        loss=b"ce",
+        title='title')
