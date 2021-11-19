@@ -82,6 +82,9 @@ Note this class ([Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py)) `GBDT-MO
 
 This gridsearch is designed to work only for the wrapper of `GBDT-MO`, if you want to do the grid search without using the wrapper, please refer to the [optimize_gbdtmo](optimize_gbdtmo.py).
 
+We also provided another script in bash to do the gridsearch out of the python. This approach consumes less memory than python.
+For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) directory.
+
 
 ## Scoring function
 The scoring we used for different problems to find a better grid are as follows;
