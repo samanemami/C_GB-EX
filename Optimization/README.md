@@ -54,7 +54,7 @@ gridsearch(X=X, y=y,
 
 The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
 
-Note that the `scoring_functions` for `Multi_output regressio`n and `Multi-label classification` must be `r2` for ranking purposes. The model will return the `RMSE` for each output
+Note that the `scoring_functions` for `Multi_output regression` and `Multi-label classification` must be `r2` for ranking purposes. The model will return the `RMSE` for each output
 
 The metric `euclidean` was added to consider the noisy and extreme value for multivariate regression problems.
 
