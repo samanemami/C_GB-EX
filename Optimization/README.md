@@ -58,6 +58,9 @@ Note that the `scoring_functions` for `Multi_output regressio`n and `Multi-label
 
 The metric `euclidean` was added to consider the noisy and extreme value for multivariate regression problems.
 
+Note the fact that the `metric` is different from the `scoring_functions` in this method.
+This `scoring_functions` is used to rank the model performance of each split in the cross-validation of the gridsearch. In contrast, the metric returns the score of the model performance based on the ranked splits of the gridsearch. The `metric` applies the predicted values of the highest-ranked split for each fold of the cross-validation to state the wanted score (RMSE or Euclidean distance).
+
 ## GBDT-MO
 Due to the high memory usage of the `GBDT-MO` model for some datasets, we defined a customized gridsearch only for this model, which consumes less memory than other methods such as gridsearchCV.
 The [Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py) method, manage the gridsearchCV for the GBDT-MO model with the following param_grid;
