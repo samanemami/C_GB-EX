@@ -1,9 +1,10 @@
 import sys
 import numpy as np
+import pandas as pd
 import sklearn.datasets as dts
 from gbdtmo import GBDTMulti, load_lib
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import StratifiedKFold, KFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 X, y = dts.load_iris(return_X_y=True)
 X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype('int32')
@@ -19,10 +20,11 @@ def convert(arg):
     return arg
 
 
-def opt(cv=2, T=100, random_state=1, loss=b"ce", title='title'):
+def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
-    score = np.zeros((cv, ))
-    path = '~/.local/lib/python3.6/site-packages/gbdtmo/build/gbdtmo.so'
+    score = []
+    param = {"max_depth": [], "lr": []}
+    path = '~/python/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
 
     if loss == b"ce":
@@ -38,44 +40,48 @@ def opt(cv=2, T=100, random_state=1, loss=b"ce", title='title'):
     depth = int(convert(sys.argv[2]))
     data = sys.argv[3]
 
+    x_train, x_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=random_state)
+
     params = {"max_depth": depth, "lr": lr, 'loss': loss,
               'verbose': False, 'subsample': 1.0}
 
     booster = GBDTMulti(LIB, out_dim=n_class, params=params)
-    for cv_i, (train_index, test_index) in enumerate(kfold.split(X, y)):
-        x_train, x_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
 
-        if data.startswith('train'):
-            index = list(kfold.split(x_train, y_train))[0]
+    if data.startswith('train'):
+        index = list(kfold.split(x_train, y_train))[0]
 
-            if data == 'train1':
-                train = index[0]
-                val = index[1]
-
-            else:
-                val = index[0]
-                train = index[1]
-
-            x_train, x_test = X[train], X[val]
-            y_train, y_test = y[train], y[val]
-            booster.set_data((x_train, y_train))
-            booster.train(T)
+        if data == 'train1':
+            train = index[0]
+            val = index[1]
 
         else:
-            booster.set_data((x_train, y_train))
-            booster.train(T)
+            val = index[0]
+            train = index[1]
 
-        score[cv_i, ] = accuracy_score(y_test, np.argmax(
-            booster.predict(x_test), axis=1))
+        x_train, x_test = x_train[train], x_train[val]
+        y_train, y_test = y_train[train], y_train[val]
 
-    np.savetxt(title + 'score.csv', score, delimiter=',')
+        booster.set_data((x_train, y_train))
+        booster.train(num)
+    # With another bash (with best parameters)
+    else:
+        booster.set_data(x_train, y_train)
+        booster.train(num)
+
+        score.append(accuracy_score(y_test, np.argmax(
+            booster.predict(x_test), axis=1)))
+
+        param['lr'].append(lr)
+        param['max_depth'].append(depth)
+
+    print("--------------")
+    print(score)
+    print("lr:", lr, "\n", "max_depth:", depth)
 
 
 if __name__ == '__main__':
-
     opt(cv=2,
-        T=100,
-        random_state=1,
-        loss=b"ce",
-        title='title')
+        num=100,
+        random_state=int(sys.argv[4]),
+        loss=b"ce")
