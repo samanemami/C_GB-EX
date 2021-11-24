@@ -10,20 +10,9 @@ X, y = dts.load_iris(return_X_y=True)
 X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype('int32')
 
 
-def convert(arg):
-    char = ["{", "}", ","]
-    for i in char:
-        try:
-            arg = arg.replace(i, "")
-        except:
-            pass
-    return arg
-
-
 def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
     score = []
-    param = {"max_depth": [], "lr": []}
     path = '~/python/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
 
@@ -36,8 +25,8 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
                       random_state=random_state)
         n_class = y.shape[1]
 
-    lr = float(convert(sys.argv[1]))
-    depth = int(convert(sys.argv[2]))
+    lr = float(sys.argv[1])
+    depth = int(sys.argv[2])
     data = sys.argv[3]
 
     x_train, x_test, y_train, y_test = train_test_split(
@@ -70,9 +59,6 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
         score.append(accuracy_score(y_test, np.argmax(
             booster.predict(x_test), axis=1)))
-
-        param['lr'].append(lr)
-        param['max_depth'].append(depth)
 
 
 
