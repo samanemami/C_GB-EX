@@ -64,7 +64,6 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
         booster.set_data((x_train, y_train))
         booster.train(num)
-    # With another bash (with best parameters)
     else:
         booster.set_data(x_train, y_train)
         booster.train(num)
@@ -75,9 +74,6 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
         param['lr'].append(lr)
         param['max_depth'].append(depth)
 
-    print("--------------")
-    print(score)
-    print("lr:", lr, "\n", "max_depth:", depth)
 
 
 if __name__ == '__main__':
