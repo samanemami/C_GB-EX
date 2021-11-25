@@ -12,7 +12,6 @@ X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype('int32')
 
 def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
-    score = []
     path = '~/python/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
 
@@ -27,9 +26,9 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
     lr = float(sys.argv[1])
     depth = int(sys.argv[2])
-    data = sys.argv[3]
-
-    x_train, x_test, y_train, y_test = train_test_split(
+    data = str(sys.argv[3])
+    
+    dftrain, dfeval, ytrain, y_eval = train_test_split(
         X, y, test_size=0.2, random_state=random_state)
 
     params = {"max_depth": depth, "lr": lr, 'loss': loss,
@@ -38,7 +37,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
     booster = GBDTMulti(LIB, out_dim=n_class, params=params)
 
     if data.startswith('train'):
-        index = list(kfold.split(x_train, y_train))[0]
+        index = list(kfold.split(dftrain, ytrain))[0]
 
         if data == 'train1':
             train = index[0]
@@ -48,18 +47,20 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
             val = index[0]
             train = index[1]
 
-        x_train, x_test = x_train[train], x_train[val]
-        y_train, y_test = y_train[train], y_train[val]
+        x_train, x_test = dftrain[train], dftrain[val]
+        y_train, y_test = ytrain[train], ytrain[val]
 
         booster.set_data((x_train, y_train))
         booster.train(num)
+
+        score = accuracy_score(y_test, np.argmax(
+            booster.predict(x_test), axis=1))
     else:
-        booster.set_data(x_train, y_train)
+        booster.set_data(dftrain, ytrain)
         booster.train(num)
 
-        score.append(accuracy_score(y_test, np.argmax(
-            booster.predict(x_test), axis=1)))
-
+        score = accuracy_score(y_eval, np.argmax(
+            booster.predict(dfeval), axis=1))
 
 
 if __name__ == '__main__':
