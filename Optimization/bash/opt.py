@@ -25,7 +25,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
     lr = float(sys.argv[1])
     depth = int(sys.argv[2])
     data = str(sys.argv[3])
-    
+
     dftrain, dfeval, ytrain, y_eval = train_test_split(
         X, y, test_size=0.2, random_state=random_state)
 
@@ -57,8 +57,8 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
         booster.set_data(dftrain, ytrain)
         booster.train(num)
 
-        score = accuracy_score(y_eval, np.argmax(
-            booster.predict(dfeval), axis=1))
+    score = accuracy_score(y_eval, np.argmax(
+        booster.predict(dfeval), axis=1))
 
 
 if __name__ == '__main__':
