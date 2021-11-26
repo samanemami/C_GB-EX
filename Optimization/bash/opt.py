@@ -16,12 +16,10 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
     LIB = load_lib(path)
 
     if loss == b"ce":
-        kfold = StratifiedKFold(n_splits=cv, shuffle=True,
-                                random_state=random_state)
+        kfold = StratifiedKFold(n_splits=cv, shuffle=False)
         n_class = len(np.unique(y))
     else:
-        kfold = KFold(n_splits=cv, shuffle=False,
-                      random_state=random_state)
+        kfold = KFold(n_splits=cv, shuffle=False)
         n_class = y.shape[1]
 
     lr = float(sys.argv[1])
