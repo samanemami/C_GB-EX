@@ -57,8 +57,8 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
         booster.set_data(dftrain, ytrain)
         booster.train(num)
 
-    score = accuracy_score(y_eval, np.argmax(
-        booster.predict(dfeval), axis=1))
+        score = accuracy_score(y_eval, np.argmax(
+            booster.predict(dfeval), axis=1))
 
 
 if __name__ == '__main__':
