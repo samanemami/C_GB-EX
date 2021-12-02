@@ -17,6 +17,17 @@ do
         
         python3 opt.py $lr $dp train1 1
         python3 opt.py $lr $dp train2 1
+        
+        INPUT=iris.csv
+        OLDIFS=$IFS
+        IFS=','
+        while read -r score depth learning_rate
+        do
+            echo "score : $score"
+            echo "depth : $depth"
+            echo "learning_rate : $learning_rate"
+        done < $INPUT
+        IFS=$OLDIFS
     done
 done
 
