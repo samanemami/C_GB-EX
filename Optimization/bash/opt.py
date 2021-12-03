@@ -59,7 +59,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
         score = accuracy_score(y_eval, np.argmax(
             booster.predict(dfeval), axis=1))
-
+    del LIB
 
 if __name__ == '__main__':
     opt(cv=2,
