@@ -59,7 +59,17 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
 
         score = accuracy_score(y_eval, np.argmax(
             booster.predict(dfeval), axis=1))
-    del LIB
+
+    _del_ctype(LIB)
+
+
+def _del_ctype(lib):
+    lib.FreeLibrary(
+        lib._handle) if sys.platform == 'win32' else lib.dlclose(lib._handle)
+    del lib
+    print(lib) if lib else print('unloaded the _ctypes library')
+    lib = None
+
 
 if __name__ == '__main__':
     opt(cv=2,
