@@ -10,7 +10,7 @@ X, y = dts.load_iris(return_X_y=True)
 X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype('int32')
 
 
-def opt(cv=2, num=100, random_state=None, loss=b"ce"):
+def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
     path = '~/python/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
@@ -63,7 +63,8 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce"):
         score = accuracy_score(y_eval, np.argmax(
             booster.predict(dfeval), axis=1))
 
-    _del_ctype(LIB)
+    if unload_lib:
+        _del_ctype()
 
 
 def _del_ctype(lib):
@@ -78,4 +79,5 @@ if __name__ == '__main__':
     opt(cv=2,
         num=100,
         random_state=int(sys.argv[4]),
-        loss=b"ce")
+        loss=b"ce", 
+        unload_lib=False)
