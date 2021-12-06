@@ -27,7 +27,7 @@ do
         do
             score=`echo "$score1 + $score" | bc`
             score=$(awk "BEGIN {print $score/2}")
-            printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
+            printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> mean_test_score.csv
         done < results.csv
     done
 done
