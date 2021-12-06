@@ -18,26 +18,23 @@ do
         ((n=n+1))
 
         python3 del.py $lr $dp train1 1
-        
         IFS=','
         while read -r score depth learning_rate
         do
-            printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
-            sum=`echo "$score + $score" | bc`
-            echo $sum
+            score1=$score
         done < results.csv
 
 
         python3 del.py $lr $dp train2 1
-
         IFS=','
         while read -r score depth learning_rate
         do
+            score=`echo "$score1 + $score" | bc`
+            score=$(awk "BEGIN {print $score/2}")
             printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
         done < results.csv
     done
 done
-
 
 echo $line
 echo "UP Time"; uptime; echo $line
