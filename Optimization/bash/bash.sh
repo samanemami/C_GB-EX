@@ -2,12 +2,9 @@
 
 line="----------"
 n=0
-fold1=train1
-fold2=train2
 
 echo $line
 echo "starting at: $(date)"; echo $line
-
 
 for lr in 0.025 0.05 0.1 0.5 1
 do
@@ -23,7 +20,6 @@ do
         do
             score1=$score
         done < results.csv
-
 
         python3 del.py $lr $dp train2 1
         IFS=','
