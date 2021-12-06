@@ -69,7 +69,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
                   'verbose': False, 'subsample': 1.0}
 
         booster = GBDTMulti(LIB, out_dim=n_class, params=params)
-        booster.set_data(dftrain, ytrain)
+        booster.set_data((dftrain, ytrain))
         booster.train(num)
 
         score = accuracy_score(y_eval, np.argmax(
