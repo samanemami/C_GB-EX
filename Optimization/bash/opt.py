@@ -55,7 +55,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
             booster.predict(x_test), axis=1))
         
         pd.DataFrame([[score, depth, lr]], columns=[
-                     'score', 'max_depth', 'learning_rate']).to_csv('reslt.csv', header=False, index=False)
+                     'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
     else:
         booster.set_data(dftrain, ytrain)
         booster.train(num)
