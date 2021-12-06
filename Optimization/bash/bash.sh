@@ -24,7 +24,7 @@ do
         while read -r score depth learning_rate
         do
             printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
-        done < reslt.csv
+        done < results.csv
 
         echo $line
 
