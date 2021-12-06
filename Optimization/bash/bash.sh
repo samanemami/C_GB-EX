@@ -14,14 +14,14 @@ do
         sleep $n
         ((n=n+1))
 
-        python3 del.py $lr $dp train1 1
+        python3 del.py $lr $dp train1
         IFS=','
         while read -r score depth learning_rate
         do
             score1=$score
         done < results.csv
 
-        python3 del.py $lr $dp train2 1
+        python3 del.py $lr $dp train2
         IFS=','
         while read -r score depth learning_rate
         do
@@ -31,6 +31,8 @@ do
         done < results.csv
     done
 done
+
+python3 del.py 1 1 test1
 
 echo $line
 echo "UP Time"; uptime; echo $line
