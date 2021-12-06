@@ -16,34 +16,19 @@ do
         echo "iter:" $n; echo $line
         sleep $n
         ((n=n+1))
-        echo "`ps aux --sort -rss`"; echo $line
 
         python3 del.py $lr $dp train1 1
         
-        INPUT=reslt.csv
-        OLDIFS=$IFS
         IFS=','
         echo "first fold"
         while read -r score depth learning_rate
         do
-            echo "score: $score"
-            echo "depth : $depth"
-            echo "learning_rate : $learning_rate"
-        done < $INPUT
-        IFS=$OLDIFS
-        
+            printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
+        done < reslt.csv
+
         echo $line
 
         python3 del.py $lr $dp train2 1 
-        echo "second fold"
-        while read -r score depth learning_rate
-        do
-            echo "score: $score"
-            echo "depth : $depth"
-            echo "learning_rate : $learning_rate"
-        done < $INPUT
-        IFS=$OLDIFS
-        
     done
 done
 
