@@ -1,4 +1,6 @@
+import os
 import sys
+import pathlib
 import numpy as np
 import pandas as pd
 import sklearn.datasets as dts
@@ -6,13 +8,13 @@ from gbdtmo import GBDTMulti, load_lib
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
-X, y = dts.load_iris(return_X_y=True)
-X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype('int32')
+X, y = dts.load_digits(return_X_y=True)
+X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.int32)
 
 
 def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
-    path = '~/python/site-packages/gbdtmo/build/gbdtmo.so'
+    path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
 
     if loss == b"ce":
@@ -22,20 +24,21 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
         kfold = KFold(n_splits=cv, shuffle=False)
         n_class = y.shape[1]
 
-    lr = float(sys.argv[1])
-    depth = int(sys.argv[2])
     data = str(sys.argv[3])
 
     dftrain, dfeval, ytrain, y_eval = train_test_split(
         X, y, test_size=0.2, random_state=random_state)
 
-    params = {"max_depth": depth, "lr": lr, 'loss': loss,
-              'verbose': False, 'subsample': 1.0}
-
-    booster = GBDTMulti(LIB, out_dim=n_class, params=params)
-
     if data.startswith('train'):
         index = list(kfold.split(dftrain, ytrain))[0]
+
+        lr = float(sys.argv[1])
+        depth = int(sys.argv[2])
+
+        params = {"max_depth": depth, "lr": lr, 'loss': loss,
+                  'verbose': False, 'subsample': 1.0}
+
+        booster = GBDTMulti(LIB, out_dim=n_class, params=params)
 
         if data == 'train1':
             train = index[0]
@@ -53,15 +56,33 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
         score = accuracy_score(y_test, np.argmax(
             booster.predict(x_test), axis=1))
-        
+
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
     else:
+        param = pd.read_csv('mean_test_score.csv', header=None)
+        id = param.iloc[:, 0].idxmax(
+        ) if loss == b'ce' else param.iloc[:, 0].idxmin()
+        depth = param.iloc[id, 1]
+        lr = param.iloc[id, 2]
+        params = {"max_depth": depth, "lr": lr, 'loss': loss,
+                  'verbose': False, 'subsample': 1.0}
+
+        booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         booster.set_data(dftrain, ytrain)
         booster.train(num)
 
         score = accuracy_score(y_eval, np.argmax(
             booster.predict(dfeval), axis=1))
+
+        pd.DataFrame([[score, depth, lr]], columns=[
+                     'score', 'max_depth', 'learning_rate']).to_csv('mean_generalization_score.csv', index=False)
+
+        try:
+            for root, dirs, files in os.walk(pathlib.Path().resolve()):
+                os.remove(os.path.join(root, 'results.csv'))
+        except:
+            pass
 
     if unload_lib:
         _del_ctype()
@@ -78,6 +99,6 @@ def _del_ctype(lib):
 if __name__ == '__main__':
     opt(cv=2,
         num=100,
-        random_state=int(sys.argv[4]),
-        loss=b"ce", 
+        random_state=1,
+        loss=b"ce",
         unload_lib=False)
