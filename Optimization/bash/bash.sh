@@ -20,15 +20,21 @@ do
         python3 del.py $lr $dp train1 1
         
         IFS=','
-        echo "first fold"
+        while read -r score depth learning_rate
+        do
+            printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
+            sum=`echo "$score + $score" | bc`
+            echo $sum
+        done < results.csv
+
+
+        python3 del.py $lr $dp train2 1
+
+        IFS=','
         while read -r score depth learning_rate
         do
             printf '%s,%s,%s\n' "$score" "$depth" "$learning_rate" >> file.csv
         done < results.csv
-
-        echo $line
-
-        python3 del.py $lr $dp train2 1 
     done
 done
 
