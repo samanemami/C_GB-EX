@@ -1,7 +1,9 @@
 #!/bin/bash
 
-line="----------------"
+line="----------"
 n=0
+fold1=train1
+fold2=train2
 
 echo $line
 echo "starting at: $(date)"; echo $line
@@ -15,23 +17,38 @@ do
         sleep $n
         ((n=n+1))
         echo "`ps aux --sort -rss`"; echo $line
+
+        python3 del.py $lr $dp train1 1
         
-        python3 opt.py $lr $dp train1 1
-        python3 opt.py $lr $dp train2 1
-        
-        INPUT=iris.csv
+        INPUT=reslt.csv
         OLDIFS=$IFS
         IFS=','
+        echo "first fold"
         while read -r score depth learning_rate
         do
-            echo "score : $score"
+            echo "score: $score"
             echo "depth : $depth"
             echo "learning_rate : $learning_rate"
         done < $INPUT
         IFS=$OLDIFS
+        
+        echo $line
+
+        python3 del.py $lr $dp train2 1 
+        echo "second fold"
+        while read -r score depth learning_rate
+        do
+            echo "score: $score"
+            echo "depth : $depth"
+            echo "learning_rate : $learning_rate"
+        done < $INPUT
+        IFS=$OLDIFS
+        
     done
 done
 
+
+echo $line
 echo "UP Time"; uptime; echo $line
 echo "memory"; free; echo $line
 echo "Finishing at $(date)"; echo $line
