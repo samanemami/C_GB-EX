@@ -1,3 +1,5 @@
+# Check the score of regression
+# unload the library
 import os
 import sys
 import pathlib
