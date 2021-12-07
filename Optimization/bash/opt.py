@@ -36,7 +36,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
         depth = int(sys.argv[2])
 
         params = {"max_depth": depth, "lr": lr, 'loss': loss,
-                  'verbose': False, 'subsample': 1.0}
+                  'verbose': False, 'subsample': 1.0, 'seed': random_state}
 
         booster = GBDTMulti(LIB, out_dim=n_class, params=params)
 
@@ -66,7 +66,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
         depth = param.iloc[id, 1]
         lr = param.iloc[id, 2]
         params = {"max_depth": depth, "lr": lr, 'loss': loss,
-                  'verbose': False, 'subsample': 1.0}
+                  'verbose': False, 'subsample': 1.0, 'seed': random_state}
 
         booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         booster.set_data((dftrain, ytrain))
