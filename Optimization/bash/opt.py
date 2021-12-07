@@ -14,7 +14,7 @@ X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.int32)
 
 def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
-    path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
+    path = '/home/user/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
     LIB = load_lib(path)
 
     if loss == b"ce":
