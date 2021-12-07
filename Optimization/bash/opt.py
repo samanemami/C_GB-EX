@@ -4,6 +4,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 import sklearn.datasets as dts
+from sklearn.metrics import r2_score
 from gbdtmo import GBDTMulti, load_lib
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
@@ -53,17 +54,17 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
         booster.set_data((x_train, y_train))
         booster.train(num)
-
-        score = accuracy_score(y_test, np.argmax(
-            booster.predict(x_test), axis=1))
+        if loss == b"ce":
+            score = accuracy_score(y_test, np.argmax(
+                booster.predict(x_test), axis=1))
+        else:
+            score = r2_score(y_test, booster.predict(x_test))
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
     else:
         param = pd.read_csv('mean_test_score.csv', header=None)
-        id = param.iloc[:, 0].idxmax(
-        ) if loss == b'ce' else param.iloc[:, 0].idxmin()
-        depth = param.iloc[id, 1]
+        depth = param.iloc[param.iloc[:, 0].idxmax(), 1]
         lr = param.iloc[id, 2]
         params = {"max_depth": depth, "lr": lr, 'loss': loss,
                   'verbose': False, 'subsample': 1.0, 'seed': random_state}
@@ -71,12 +72,21 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
         booster = GBDTMulti(LIB, out_dim=n_class, params=params)
         booster.set_data((dftrain, ytrain))
         booster.train(num)
-
-        score = accuracy_score(y_eval, np.argmax(
-            booster.predict(dfeval), axis=1))
+        if loss == b"ce":
+            score = accuracy_score(y_eval, np.argmax(
+                booster.predict(dfeval), axis=1))
+        else:
+            score = np.mean(
+                np.sqrt(np.power(y_eval - booster.predict(dfeval), 2).sum(axis=1)))
+            rmse = np.sqrt(np.average(
+                (y_eval - booster.predict(dfeval))**2, axis=0))
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('mean_generalization_score.csv', index=False)
+        try:
+            pd.Series(rmse).to_csv('RMSE.csv')
+        except:
+            pass
 
         try:
             for root, dirs, files in os.walk(pathlib.Path().resolve()):
