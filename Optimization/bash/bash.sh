@@ -14,14 +14,14 @@ do
         sleep $n
         ((n=n+1))
 
-        python3 del.py $lr $dp train1
+        python3 opt.py $lr $dp train1
         IFS=','
         while read -r score depth learning_rate
         do
             score1=$score
         done < results.csv
 
-        python3 del.py $lr $dp train2
+        python3 opt.py $lr $dp train2
         IFS=','
         while read -r score depth learning_rate
         do
