@@ -92,7 +92,6 @@ def _del_ctype(lib):
     lib.FreeLibrary(
         lib._handle) if sys.platform == 'win32' else lib.dlclose(lib._handle)
     del lib
-    print(lib) if lib else print('unloaded the _ctypes library')
     lib = None
 
 
