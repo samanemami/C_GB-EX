@@ -103,6 +103,8 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
             print("*", end='')
         lib = None
 
+    globals().clear()
+
 
 def isLoaded(lib):
     libp = os.path.abspath(lib)
