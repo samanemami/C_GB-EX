@@ -67,7 +67,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
     else:
         param = pd.read_csv('mean_test_score.csv', header=None)
         depth = param.iloc[param.iloc[:, 0].idxmax(), 1]
-        lr = param.iloc[id, 2]
+        lr = param.iloc[param.iloc[:, 0].idxmax(), 2]
         params = {"max_depth": depth, "lr": lr, 'loss': loss,
                   'verbose': False, 'subsample': 1.0, 'seed': random_state}
 
