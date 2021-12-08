@@ -32,7 +32,7 @@ do
     done
 done
 
-python3 del.py 1 1 test1
+python3 opt.py 1 1 test1
 
 echo $line
 echo "UP Time"; uptime; echo $line
