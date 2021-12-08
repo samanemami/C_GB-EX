@@ -1,7 +1,6 @@
-# Check the score of regression
-# unload the library
 import os
 import sys
+import ctypes
 import pathlib
 import numpy as np
 import pandas as pd
@@ -18,7 +17,7 @@ X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.int32)
 def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
     path = '/home/user/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
-    LIB = load_lib(path)
+    lib = load_lib(path)
 
     if loss == b"ce":
         kfold = StratifiedKFold(n_splits=cv, shuffle=False)
@@ -41,7 +40,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
         params = {"max_depth": depth, "lr": lr, 'loss': loss,
                   'verbose': False, 'subsample': 1.0, 'seed': random_state}
 
-        booster = GBDTMulti(LIB, out_dim=n_class, params=params)
+        booster = GBDTMulti(lib, out_dim=n_class, params=params)
 
         if data == 'train1':
             train = index[0]
@@ -71,7 +70,7 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
         params = {"max_depth": depth, "lr": lr, 'loss': loss,
                   'verbose': False, 'subsample': 1.0, 'seed': random_state}
 
-        booster = GBDTMulti(LIB, out_dim=n_class, params=params)
+        booster = GBDTMulti(lib, out_dim=n_class, params=params)
         booster.set_data((dftrain, ytrain))
         booster.train(num)
         if loss == b"ce":
@@ -97,14 +96,24 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
             pass
 
     if unload_lib:
-        _del_ctype()
+        handle = lib._handle
+        del lib
+        while isLoaded(path):
+            dlclose(handle)
+            print("*", end='')
+        lib = None
 
 
-def _del_ctype(lib):
-    lib.FreeLibrary(
-        lib._handle) if sys.platform == 'win32' else lib.dlclose(lib._handle)
-    del lib
-    lib = None
+def isLoaded(lib):
+    libp = os.path.abspath(lib)
+    ret = os.system("lsof -p %d | grep %s > /dev/null" %
+                    (os.getpid(), libp))
+    return (ret == 0)
+
+
+def dlclose(handle):
+    libdl = ctypes.CDLL("libdl.so")
+    libdl.dlclose(handle)
 
 
 if __name__ == '__main__':
