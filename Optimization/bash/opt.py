@@ -25,7 +25,7 @@ def opt(X, y, cv, num, random_state, loss, unload_lib):
     else:
         kfold = KFold(n_splits=cv, shuffle=False)
         n_class = y.shape[1]
-        X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.float64)
+        X, y = np.ascontiguousarray(X, dtype=np.float64), np.ascontiguousarray(y, dtype=np.float64)
 
     data = str(sys.argv[3])
 
