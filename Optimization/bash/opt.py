@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 X, y = dts.load_digits(return_X_y=True)
 
 
-def opt(X, y, cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
+def opt(X, y, cv, num, random_state, loss, unload_lib):
 
     path = '/home/user/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
