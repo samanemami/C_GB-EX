@@ -11,10 +11,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 X, y = dts.load_digits(return_X_y=True)
-X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.int32)
 
 
-def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
+def opt(X, y, cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
 
     path = '/home/user/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
@@ -22,9 +21,11 @@ def opt(cv=2, num=100, random_state=None, loss=b"ce", unload_lib=False):
     if loss == b"ce":
         kfold = StratifiedKFold(n_splits=cv, shuffle=False)
         n_class = len(np.unique(y))
+        X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.int32)
     else:
         kfold = KFold(n_splits=cv, shuffle=False)
         n_class = y.shape[1]
+        X, y = np.ascontiguousarray(X, dtype=np.float64), y.astype(np.float64)
 
     data = str(sys.argv[3])
 
