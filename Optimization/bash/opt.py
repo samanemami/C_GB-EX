@@ -120,7 +120,9 @@ def dlclose(handle):
 
 
 if __name__ == '__main__':
-    opt(cv=2,
+    opt(X=X,
+        y=y,
+        cv=2,
         num=100,
         random_state=1,
         loss=b"ce",
