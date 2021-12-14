@@ -1,3 +1,5 @@
+# need to define the train and test and two train folds and one generalization 
+
 import sys
 import numpy as np
 import pandas as pd
