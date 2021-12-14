@@ -13,7 +13,7 @@ random_state = 1
 clf = False
 cv = 5
 
-path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
+path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 LIB = load_lib(path)
 
 param_grid = {"max_depth": [2, 5, 10, 20],
