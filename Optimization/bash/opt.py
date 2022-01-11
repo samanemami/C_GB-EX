@@ -5,9 +5,8 @@ import pathlib
 import numpy as np
 import pandas as pd
 import sklearn.datasets as dts
-from sklearn.metrics import r2_score
 from gbdtmo import GBDTMulti, load_lib
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, r2_score, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 X, y = dts.load_digits(return_X_y=True)
@@ -15,7 +14,7 @@ X, y = dts.load_digits(return_X_y=True)
 
 def opt(X, y, cv, num, random_state, loss, unload_lib):
 
-    path = '/home/user/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
+    path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
 
     if loss == b"ce":
@@ -25,7 +24,8 @@ def opt(X, y, cv, num, random_state, loss, unload_lib):
     else:
         kfold = KFold(n_splits=cv, shuffle=False)
         n_class = y.shape[1]
-        X, y = np.ascontiguousarray(X, dtype=np.float64), np.ascontiguousarray(y, dtype=np.float64)
+        X, y = np.ascontiguousarray(
+            X, dtype=np.float64), np.ascontiguousarray(y, dtype=np.float64)
 
     data = str(sys.argv[3])
 
@@ -75,16 +75,19 @@ def opt(X, y, cv, num, random_state, loss, unload_lib):
         booster.set_data((dftrain, ytrain))
         booster.train(num)
         if loss == b"ce":
-            score = accuracy_score(y_eval, np.argmax(
-                booster.predict(dfeval), axis=1))
+            pred = np.argmax(booster.predict(dfeval), axis=1)
+            score = accuracy_score(y_eval, pred)
+            cf = confusion_matrix(y_eval, pred)
+            pd.DataFrame(cf).to_csv('CF_Matrix.csv', index=False, header=False)
         else:
-            score = np.mean(
-                np.sqrt(np.power(y_eval - booster.predict(dfeval), 2).sum(axis=1)))
+            pred = booster.predict(dfeval)
+            score = np.mean(np.sqrt(np.power(y_eval - pred, 2).sum(axis=1)))
             rmse = np.sqrt(np.average(
                 (y_eval - booster.predict(dfeval))**2, axis=0))
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('mean_generalization_score.csv', index=False)
+        pd.DataFrame(pred).to_csv('pred.csv', index=None, header=None)
         try:
             pd.Series(rmse).to_csv('RMSE.csv')
         except:
