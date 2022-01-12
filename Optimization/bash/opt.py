@@ -1,18 +1,14 @@
 import os
 import sys
-import ctypes
 import pathlib
 import numpy as np
 import pandas as pd
-import sklearn.datasets as dts
 from gbdtmo import GBDTMulti, load_lib
 from sklearn.metrics import accuracy_score, r2_score, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
-X, y = dts.load_digits(return_X_y=True)
 
-
-def opt(X, y, cv, num, random_state, loss, unload_lib):
+def gridsearch(X, y, cv, num, random_state, loss):
 
     path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
@@ -57,10 +53,13 @@ def opt(X, y, cv, num, random_state, loss, unload_lib):
         booster.set_data((x_train, y_train))
         booster.train(num)
         if loss == b"ce":
-            score = accuracy_score(y_test, np.argmax(
-                booster.predict(x_test), axis=1))
+            pred = np.argmax(booster.predict(x_test), axis=1)
+            score = accuracy_score(y_test, pred)
+            print(confusion_matrix(y_test, pred))
+            print('------------')
         else:
-            score = r2_score(y_test, booster.predict(x_test))
+            pred = booster.predict(x_test)
+            score = r2_score(y_test, pred)
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
@@ -99,34 +98,4 @@ def opt(X, y, cv, num, random_state, loss, unload_lib):
         except:
             pass
 
-    if unload_lib:
-        handle = lib._handle
-        del lib
-        while isLoaded(path):
-            dlclose(handle)
-            print("*", end='')
-        lib = None
-
     globals().clear()
-
-
-def isLoaded(lib):
-    libp = os.path.abspath(lib)
-    ret = os.system("lsof -p %d | grep %s > /dev/null" %
-                    (os.getpid(), libp))
-    return (ret == 0)
-
-
-def dlclose(handle):
-    libdl = ctypes.CDLL("libdl.so")
-    libdl.dlclose(handle)
-
-
-if __name__ == '__main__':
-    opt(X=X,
-        y=y,
-        cv=2,
-        num=100,
-        random_state=1,
-        loss=b"ce",
-        unload_lib=False)
