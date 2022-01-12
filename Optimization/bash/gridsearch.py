@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, r2_score, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 
-def gridsearch(X, y, cv, num, random_state, loss):
+def gridsearchcv(X, y, cv, num, random_state, loss):
 
     path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
