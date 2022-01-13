@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, r2_score, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 
-def gridsearchcv(X, y, num, random_state, loss):
+def gridsearchcv(X, y, num_train, num_test, random_state, loss):
 
     path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
@@ -35,8 +35,7 @@ def gridsearchcv(X, y, num, random_state, loss):
         lr = float(sys.argv[1])
         depth = int(sys.argv[2])
 
-        params = {"max_depth": depth, "lr": lr, 'loss': loss,
-                  'verbose': False, 'subsample': 1.0, 'seed': random_state}
+        params = {"max_depth": depth, "lr": lr, 'loss': loss, 'verbose': False}
 
         booster = GBDTMulti(lib, out_dim=n_class, params=params)
 
@@ -51,8 +50,8 @@ def gridsearchcv(X, y, num, random_state, loss):
         x_train, x_test = dftrain[train], dftrain[val]
         y_train, y_test = ytrain[train], ytrain[val]
 
-        booster.set_data((x_train, y_train))
-        booster.train(num)
+        booster.set_data((x_train, y_train), (x_test, y_test))
+        booster.train(num_train)
         if loss == b"ce":
             pred = np.argmax(booster.predict(x_test), axis=1)
             score = accuracy_score(y_test, pred)
@@ -68,12 +67,11 @@ def gridsearchcv(X, y, num, random_state, loss):
         param = pd.read_csv('mean_test_score.csv', header=None)
         depth = param.iloc[param.iloc[:, 0].idxmax(), 1]
         lr = param.iloc[param.iloc[:, 0].idxmax(), 2]
-        params = {"max_depth": depth, "lr": lr, 'loss': loss,
-                  'verbose': False, 'subsample': 1.0, 'seed': random_state}
+        params = {"max_depth": depth, "lr": lr, 'loss': loss, 'verbose': False}
 
         booster = GBDTMulti(lib, out_dim=n_class, params=params)
-        booster.set_data((dftrain, ytrain))
-        booster.train(num)
+        booster.set_data((dftrain, ytrain), (dfeval, y_eval))
+        booster.train(num_test)
         if loss == b"ce":
             pred = np.argmax(booster.predict(dfeval), axis=1)
             score = accuracy_score(y_eval, pred)
@@ -98,5 +96,3 @@ def gridsearchcv(X, y, num, random_state, loss):
                 os.remove(os.path.join(root, 'results.csv'))
         except:
             pass
-
-    globals().clear()
