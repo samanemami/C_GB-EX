@@ -57,8 +57,10 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
             pred = np.argmax(booster.predict(x_test), axis=1)
             score = accuracy_score(y_test, pred)
             if verbose:
-                print(confusion_matrix(y_test, pred),
-                      '\n', '------------')
+                print('\n',
+                      'confusion matrix',
+                      '\n',
+                      confusion_matrix(y_test, pred))
 
         else:
             pred = booster.predict(x_test)
