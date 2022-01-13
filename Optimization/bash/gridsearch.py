@@ -4,7 +4,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 from gbdtmo import GBDTMulti, load_lib
-from sklearn.metrics import accuracy_score, r2_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 
@@ -64,14 +64,19 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
 
         else:
             pred = booster.predict(x_test)
-            score = r2_score(y_test, pred)
+            score = np.mean(np.sqrt(np.average((y_test - pred)**2, axis=0)))
+            # The training score is the average of the RMSE for all the outputs
+            if verbose:
+                print('RMSE: ', score)
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
     else:
         param = pd.read_csv('mean_test_score.csv', header=None)
-        depth = param.iloc[param.iloc[:, 0].idxmax(), 1]
-        lr = param.iloc[param.iloc[:, 0].idxmax(), 2]
+        id = param.iloc[:, 0].idxmax(
+        ) if loss == b"ce" else param.iloc[:, 0].idxmin()
+        depth = param.iloc[id, 1]
+        lr = param.iloc[id, 2]
         params = {"max_depth": depth, "lr": lr,
                   'loss': loss, 'verbose': verbose}
 
@@ -88,7 +93,7 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
             pred = booster.predict(dfeval)
             score = np.mean(np.sqrt(np.power(y_eval - pred, 2).sum(axis=1)))
             rmse = np.sqrt(np.average((y_eval - pred)**2, axis=0))
-
+            # The score here is equal to Euclidean distance
             pd.Series(rmse).to_csv('RMSE.csv')
 
         pd.DataFrame([[score, depth, lr]], columns=[
