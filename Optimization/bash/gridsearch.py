@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, r2_score, confusion_matrix
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 
-def gridsearchcv(X, y, num_train, num_test, random_state, loss):
+def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
 
     path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
     lib = load_lib(path)
@@ -35,7 +35,8 @@ def gridsearchcv(X, y, num_train, num_test, random_state, loss):
         lr = float(sys.argv[1])
         depth = int(sys.argv[2])
 
-        params = {"max_depth": depth, "lr": lr, 'loss': loss, 'verbose': False}
+        params = {"max_depth": depth, "lr": lr,
+                  'loss': loss, 'verbose': verbose}
 
         booster = GBDTMulti(lib, out_dim=n_class, params=params)
 
@@ -55,8 +56,10 @@ def gridsearchcv(X, y, num_train, num_test, random_state, loss):
         if loss == b"ce":
             pred = np.argmax(booster.predict(x_test), axis=1)
             score = accuracy_score(y_test, pred)
-            print(confusion_matrix(y_test, pred))
-            print('------------')
+            if verbose:
+                print(confusion_matrix(y_test, pred),
+                      '\n', '------------')
+
         else:
             pred = booster.predict(x_test)
             score = r2_score(y_test, pred)
@@ -67,11 +70,13 @@ def gridsearchcv(X, y, num_train, num_test, random_state, loss):
         param = pd.read_csv('mean_test_score.csv', header=None)
         depth = param.iloc[param.iloc[:, 0].idxmax(), 1]
         lr = param.iloc[param.iloc[:, 0].idxmax(), 2]
-        params = {"max_depth": depth, "lr": lr, 'loss': loss, 'verbose': False}
+        params = {"max_depth": depth, "lr": lr,
+                  'loss': loss, 'verbose': verbose}
 
         booster = GBDTMulti(lib, out_dim=n_class, params=params)
         booster.set_data((dftrain, ytrain), (dfeval, y_eval))
         booster.train(num_test)
+
         if loss == b"ce":
             pred = np.argmax(booster.predict(dfeval), axis=1)
             score = accuracy_score(y_eval, pred)
@@ -80,16 +85,13 @@ def gridsearchcv(X, y, num_train, num_test, random_state, loss):
         else:
             pred = booster.predict(dfeval)
             score = np.mean(np.sqrt(np.power(y_eval - pred, 2).sum(axis=1)))
-            rmse = np.sqrt(np.average(
-                (y_eval - booster.predict(dfeval))**2, axis=0))
+            rmse = np.sqrt(np.average((y_eval - pred)**2, axis=0))
+
+            pd.Series(rmse).to_csv('RMSE.csv')
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('mean_generalization_score.csv', index=False)
         pd.DataFrame(pred).to_csv('pred.csv', index=None, header=None)
-        try:
-            pd.Series(rmse).to_csv('RMSE.csv')
-        except:
-            pass
 
         try:
             for root, dirs, files in os.walk(pathlib.Path().resolve()):
