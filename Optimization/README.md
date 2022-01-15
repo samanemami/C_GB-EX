@@ -45,7 +45,7 @@ gridsearch(X=X, y=y,
         metric: str, {'euclidean', 'rmse'} default=None
                             if clf is Flase:
                                        if metric is 'euclidean': score = euclidean distance
-                                                       (Only works for multi-outputs rehression)
+                                                       (Only works for multi-outputs regression)
                                        if metric is 'rmse': score = rmse
                             
 
