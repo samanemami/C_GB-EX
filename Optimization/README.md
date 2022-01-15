@@ -14,14 +14,13 @@ gridsearch(X=X, y=y,
            grid=param_grid,
            scoring_functions='accuracy',
            pipeline=None,
-           best_scoring=True,
            random_state=1,
            n_cv_general=2,
            n_cv_intrain=2,
            verbose=True,
            clf=True,
            metric=None,
-           title='Dataset')
+           title='Method1')
 
 
 '''Python
