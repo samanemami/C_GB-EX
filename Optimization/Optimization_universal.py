@@ -25,7 +25,6 @@ def ProgressBar(percent, barLen=20):
 def gridsearch(X, y, model, grid,
                scoring_functions=None,
                pipeline=None,
-               best_scoring=True,
                random_state=None,
                n_cv_general=10,
                n_cv_intrain=10,
@@ -102,7 +101,7 @@ def gridsearch(X, y, model, grid,
         grid_search = GridSearchCV(estimator, grid,
                                    cv=kfold,
                                    scoring=scoring_functions,
-                                   refit=best_scoring,
+                                   refit=True,
                                    return_train_score=False,
                                    )
 
@@ -117,13 +116,12 @@ def gridsearch(X, y, model, grid,
         if clf is False:
             try:
                 if metric == 'rmse':
+                    output_errors = np.sqrt(np.average(
+                        (y_test - pred[test_index])**2, axis=0))
                     if y.shape[1] > 1:
-                        output_errors = np.sqrt(np.average(
-                            (y_test - pred[test_index])**2, axis=0))
                         err[cv_i, :] = output_errors
                     else:
                         err[cv_i, ] = output_errors
-
                 elif metric == 'euclidean':
                     err[cv_i, ] = np.mean(
                         np.sqrt(np.power(y - pred, 2).sum(axis=1)))
@@ -170,21 +168,21 @@ def gridsearch(X, y, model, grid,
         best_index_time[:, 1], axis=0)
 
     pd.DataFrame(results).to_csv(
-        title + ' ' + scoring_functions + '- Summary.csv')
+        title + '_' + scoring_functions + '_Summary.csv')
     pd.DataFrame(cv_results).to_csv(
-        title + ' ' + scoring_functions + '- CV_results.csv')
+        title + '_' + scoring_functions + '_CV_results.csv')
     pd.DataFrame(bestparams).to_csv(
-        title + ' ' + scoring_functions + '- Best_Parameters.csv')
+        title + '_' + scoring_functions + '_Best_Parameters.csv')
     pd.DataFrame(best_index_time, columns=["Fit_time", "Score_time"]).to_csv(
-        title + '- Best_Index_time.csv')
+        title + '_Best_Index_time.csv')
     try:
-        np.savetxt(title + '-predicted_values.csv', pred, delimiter=',')
+        np.savetxt(title + '_predicted_values.csv', pred, delimiter=',')
         reg_score = {}
-        reg_score['mean ' + metric] = np.mean(err, axis=0)
-        reg_score['std ' + metric] = np.std(err, axis=0)
-        pd.DataFrame(reg_score, index=[list('target-' + str(i) for i in range(y.shape[1])) if metric == 'rmse' else 'Distance']).to_csv(
+        reg_score['mean_' + metric] = np.mean(err, axis=0)
+        reg_score['std_' + metric] = np.std(err, axis=0)
+        pd.DataFrame(reg_score, index=[list('target_' + str(i) for i in range(y.shape[1])) if metric == 'rmse' else 'Distance']).to_csv(
             title + ' ' + metric + ' score.csv')
-        pd.DataFrame(err, index=['split-' + str(i) for i in range(n_cv_general)]
-                     ).to_csv(title + ' ' + metric + ' report.csv')
+        pd.DataFrame(err, index=['split_' + str(i) for i in range(n_cv_general)]
+                     ).to_csv(title + '_' + metric + ' report.csv')
     except:
         pass
