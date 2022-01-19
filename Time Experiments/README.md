@@ -9,4 +9,4 @@ To split the dataset, we used the ShuffleSplit cross-validation method with 10-f
 For the `TFBT` and `GBDT-MO` models, the `time.process_time()` defined inside of their wrapper in the `_model_complexity` method, which returns a tuple of training time and consumed memory.
 
 
-If you prefer not to use the wrapper for the `TFBT` of the `GBDT-MO` models, you may have the [`gbdtmo_time.py`](gbdtmo_time.py) file for each of them. This file only works for the GBDT-MO. Likewise, for the TFBT, you have to use the model without the wrapper.
+If you prefer not to use the wrapper for the `TFBT` or the `GBDT-MO` models, you may use the [`gbdtmo_time.py`](gbdtmo_time.py) for each of them. This file only works for the `GBDT-MO`. Likewise, for the `TFBT`, you have to use the `TensorFlow Boosted Tree` without the wrapper.
