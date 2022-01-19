@@ -1,6 +1,6 @@
 # Training time experiments
 
-For the training time, there is one [example](Training_time_cross_validator.py) of calculating this metric. The calculation is based on the seconds. This example uses the Random permutation cross-validator to split the indices. You may use a [simple Split](Training_time_simple_split.py) method to reduce the calculation time.
+For the training time, there is one [example](Training_time_cross_validator.py) of calculating this metric. The time calculation is based on the seconds. This example uses the Random permutation cross-validator to split the indices. You may use a [simple Split](Training_time_simple_split.py) method to reduce the calculation time.
 
 Instead of `time.time()`, we used `time.process_time()`, which returns the sum of the system and user CPU time of the current process and guarantees that the return would be correct even if the hardware has put the jobs on hold.
 
