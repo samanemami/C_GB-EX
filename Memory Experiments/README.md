@@ -1,8 +1,3 @@
-<p align="center">
-  <img src="https://github.com/samanemami/C_GB-EX/blob/main/docs/letter-all.jpg">
-</p>
-
-
 # Memory experiments
 
 For memory consumptions, we considered different profilers and libraries to have robust and reliable results.
