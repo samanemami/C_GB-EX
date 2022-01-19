@@ -7,3 +7,6 @@ The hyperparameters for all of the models are the same with one random seed. As 
 To split the dataset, we used the ShuffleSplit cross-validation method with 10-folds to return the train and test indexes.
 
 For the `TFBT` and `GBDT-MO` models, the `time.process_time()` defined inside of their wrapper in the `_model_complexity` method, which returns a tuple of training time and consumed memory.
+
+
+If you prefer not to use the wrapper for the `TFBT` of the `GBDT-MO` models, you may have the [`gbdtmo_time.py`](gbdtmo_time.py) file for each of them. This file only works for the GBDT-MO. Likewise, for the TFBT, you have to use the model without the wrapper.
