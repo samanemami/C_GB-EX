@@ -2,20 +2,26 @@
 Condensed Gradient Boosting Decision Tree - Examples
 
 # About
-This project has two purposes:
+This project has four main purposes:
 <ul>
 <li> provides real examples to use C-GB </li>
 <li> provides codes for reproduction the paper experiments </li>
+<li> Provides additional comparisons </li>
+<li> Fixes the compared models' bugs </li>
 </ul>
 
 Moreover, in this project, one may find additional experiments which they are not in the paper.
 
 # Usage
-First, the C-GB package should be installed. 
-To use TFBT and GBDTMO, first, you have to install the related packages and then use their wrapper.
-To install the C-GB, please refer to C-GB.
-To download the related wrappers, use the following links;
+First, the following packages should be installed. 
 
+* [Condensed Gradient Boosting Decision Tree](https://github.com/samanemami/C-GB)
+* [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
+* [GradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
+* [BoostedTreesEstimator](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesEstimator)
+* [Gradient Boosted Decision Tree for Multiple Outputs](https://github.com/zzd1992/GBDTMO)
+
+For some of the experiments, it would be easier to use related wrappers. For this purpose, the wrappers have designed as the following;
 
 * [GBDTM-O-wrapper](https://github.com/samanemami/GBDTMO/blob/master/gbdtmo/wrapper.py)
 * [TFBT-wrapper](https://github.com/samanemami/TFBoostedTree)
@@ -23,9 +29,10 @@ To download the related wrappers, use the following links;
 
 # Models used for comparison
 
-* C-GB 
-* [GBDTM-O](https://github.com/zzd1992/GBDTMO)
+* [C-GB](https://github.com/samanemami/C-GB)
 * [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
+* [GradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
+* [GBDTM-O](https://arxiv.org/abs/1909.04373)
 * [TFBT](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesClassifier)
 
 # The included examples
@@ -40,7 +47,6 @@ There are related codes for different experiments. The experiments are as follow
   <li> Measuring the loss curve </li>
 </ul>
 
-To make the comparison more user-friendly, we developed related wrappers with the access link to clone/install.
 
 ## Visualization
 
