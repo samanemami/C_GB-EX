@@ -12,7 +12,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 
 X, y = dt.load_iris(return_X_y=True)
 
-max_depth = 10
+max_depth = 5
 random_state = 1
 n = 10
 path = 'path to lib.so'
