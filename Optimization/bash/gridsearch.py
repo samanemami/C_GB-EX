@@ -64,10 +64,10 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
 
         else:
             pred = booster.predict(x_test)
-            score = np.mean(np.sqrt(np.average((y_test - pred)**2, axis=0)))
-            # The training score is the average of the RMSE for all the outputs
+            score = r2_score(y_test, pred)
+            # The training score is r2 score_ndarray of scores
             if verbose:
-                print('RMSE: ', score)
+                print('r2_score: ', score)
 
         pd.DataFrame([[score, depth, lr]], columns=[
                      'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
