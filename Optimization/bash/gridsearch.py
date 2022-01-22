@@ -4,7 +4,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 from gbdtmo import GBDTMulti, load_lib
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, r2_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 
 
@@ -73,8 +73,8 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
                      'score', 'max_depth', 'learning_rate']).to_csv('results.csv', header=False, index=False)
     else:
         param = pd.read_csv('mean_test_score.csv', header=None)
-        id = param.iloc[:, 0].idxmax(
-        ) if loss == b"ce" else param.iloc[:, 0].idxmin()
+        # Select the argument which has the highest score (Accuracy or R2)
+        id = param.iloc[:, 0].idxmax()
         depth = param.iloc[id, 1]
         lr = param.iloc[id, 2]
         params = {"max_depth": depth, "lr": lr,
@@ -91,9 +91,10 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
             pd.DataFrame(cf).to_csv('CF_Matrix.csv', index=False, header=False)
         else:
             pred = booster.predict(dfeval)
-            score = np.mean(np.sqrt(np.power(y_eval - pred, 2).sum(axis=1)))
+            score = r2_score(y_eval, pred)
             rmse = np.sqrt(np.average((y_eval - pred)**2, axis=0))
-            # The score here is equal to Euclidean distance
+            # The score here is equal to r2 score.
+            # Best possible score is 1.0.
             pd.Series(rmse).to_csv('RMSE.csv')
 
         pd.DataFrame([[score, depth, lr]], columns=[
