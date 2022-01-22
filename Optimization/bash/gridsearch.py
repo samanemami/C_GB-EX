@@ -66,6 +66,8 @@ def gridsearchcv(X, y, num_train, num_test, loss, random_state, verbose):
             pred = booster.predict(x_test)
             score = r2_score(y_test, pred)
             # The training score is r2 score_ndarray of scores
+            # Best score is 1.0.
+            # If the model is arbitrarily worse then the score would be negative.
             if verbose:
                 print('r2_score: ', score)
 
