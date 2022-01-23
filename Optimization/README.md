@@ -70,8 +70,10 @@ With this approach, we include the grid inside the bash file, and by calling the
 
 ### Cross-validation only
 We also defined a customized Cross-validation only for `GBDT-MO`, which consumes less memory.
+
 <h5> Note that this part only considers the train and validation and does not have the final test training. </h5>
-<h5> Please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) optimization for tuning the `GBDT-MO` hyperparameters. </h5>
+
+Please refer to the **<span style='color:red'> [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) optimization </span>** for tuning the `GBDT-MO` hyperparameters. 
 The [Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py) method, manage the gridsearchCV for the GBDT-MO model with the following param_grid;
 ```Python
 param_grid = {"max_depth": [2, 5, 10, 20],
