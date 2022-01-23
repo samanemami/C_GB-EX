@@ -40,7 +40,7 @@ plt.scatter(X[:, 0], X[:, 1], c=y)
 x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=1)
 
-path = '/home/oem/.local/lib/python3.8/site-packages/gbdtmo/build/gbdtmo.so'
+path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 
 c_gb = C_GradientBoostingClassifier(max_depth=20,
                                     subsample=0.75,
