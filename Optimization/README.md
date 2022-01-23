@@ -73,7 +73,7 @@ We also defined a customized Cross-validation only for `GBDT-MO`, which consumes
 
 <h5> Note that this part only considers the train and validation and does not have the final test training. </h5>
 
-Please refer to the **<span style='color:red'> [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) optimization </span>** for tuning the `GBDT-MO` hyperparameters. 
+>  Please refer to the **<span style='color:red'> [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) optimization </span>** for tuning the `GBDT-MO` hyperparameters. 
 
 
 The [Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py) method, manage the gridsearchCV for the GBDT-MO model with the following param_grid;
