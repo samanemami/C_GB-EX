@@ -87,6 +87,7 @@ This gridsearch is designed to work only for the wrapper of `GBDT-MO`, if you wa
 
 We also provided another script in bash to do the gridsearch out of the python. This approach consumes less memory than python.
 For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) directory.
+With this approach, we include the grid inside the bash file, and by calling the python file, it trains the model with new arguments and stores the validation score in a separate file. For the test part, it trains the best_estimator with the optimum arguments and returns the generalization score.
 
 
 ## Scoring function
