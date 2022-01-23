@@ -41,6 +41,7 @@ x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=1)
 
 path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
+tfbt_path = "Path_to_remove_tf_logs"
 
 c_gb = C_GradientBoostingClassifier(max_depth=20,
                                     subsample=0.75,
@@ -81,7 +82,7 @@ model_tfbt = BoostedTreesClassifier(label_vocabulary=None,
                                     max_depth=10,
                                     learning_rate=0.1,
                                     steps=100,
-                                    model_dir='/home/oem/Desktop/temp1'
+                                    model_dir= tfbt_path,
                                     )
 
 model_tfbt.fit(x_train, y_train)
