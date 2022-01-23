@@ -66,7 +66,20 @@ Due to the high memory usage of the `GBDT-MO` model we provided a script in bash
 For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) directory.
 With this approach, we include the grid inside the bash file, and by calling the python file, it trains the model with new arguments and stores the validation score in a separate file. For the test part, it trains the best_estimator with the optimum arguments and returns the generalization score.
 
+The grid that considered for this optimization is as follows;
+As the subsample does not influence the mode, we skip it for the tunning.
 
+```bash
+for lr in 0.025 0.05 0.1 0.5 1
+do
+    for dp in 2 5 10 20
+    do
+    
+    python3 opt.py $lr $dp train1
+    
+    done
+done
+```
 
 ### Cross-validation only
 We also defined a customized Cross-validation only for `GBDT-MO`, which consumes less memory.
