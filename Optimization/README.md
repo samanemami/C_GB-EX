@@ -63,7 +63,7 @@ This `scoring_functions` is used to rank the model performance of each split in 
 ### Optimization with bash
 
 Due to the high memory usage of the `GBDT-MO` model we provided a script in bash to do the gridsearch out of the python. This approach consumes less memory than python.
-For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) directory.
+For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](bash_gbdtmo) directory.
 With this approach, we include the grid inside the bash file, and by calling the python file, it trains the model with new arguments and stores the validation score in a separate file. For the test part, it trains the best_estimator with the optimum arguments and returns the generalization score.
 
 The grid that considered for this optimization is as follows;
@@ -80,39 +80,6 @@ do
     done
 done
 ```
-
-### Cross-validation only
-We also defined a customized Cross-validation only for `GBDT-MO`, which consumes less memory.
-
-<h5> Note that this part only considers the train and validation and does not have the final test training. </h5>
-
->  Please refer to the **<span style='color:red'> [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) optimization </span>** for tuning the `GBDT-MO` hyperparameters. 
-
-
-The [Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py) method, manage the gridsearchCV for the GBDT-MO model with the following param_grid;
-```Python
-param_grid = {"max_depth": [2, 5, 10, 20],
-              "learning_rate": [0.025, 0.05, 0.1, 0.5, 1],
-              "subsample": [0.75, 0.5, 1]}
-```
-To tune the hyperparameters of the GBDT-MO, one can use this method as follows;
-```Python
-gridsearch(X=X, y=y,
-           cv=2
-           random_state=1,
-           path='path.so',
-           param_grid=param_grid,
-           verbose=True,
-           verbose=True,
-           clf=True)
-```
-The `clf` defines the model that we considered to be optimized, is classification (`True`) or regression (`False`).
-Note this class ([Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py)) `GBDT-MO` wrapper with the mentioned grid. 
-
-This gridsearch is designed to work only for the wrapper of `GBDT-MO`, if you want to do the grid search without using the wrapper, please refer to the [optimize_gbdtmo](optimize_gbdtmo.py).
-
-
-
 
 ## Scoring function
 The scoring we used for different problems to find a better grid are as follows;
