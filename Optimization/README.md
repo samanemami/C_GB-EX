@@ -1,7 +1,5 @@
 # Tuning the hyperparameters
 
-
-
 We defined an optimization class including cross-validation for each model and problem.
 
 
@@ -62,7 +60,18 @@ Note the fact that the `metric` is different from the `scoring_functions` in thi
 This `scoring_functions` is used to rank the model performance of each split in the cross-validation of the gridsearch. In contrast, the metric returns the score of the model performance based on the ranked splits of the gridsearch. The `metric` applies the predicted values of the highest-ranked split for each fold of the cross-validation to state the wanted score (RMSE or Euclidean distance).
 
 ## GBDT-MO
-Due to the high memory usage of the `GBDT-MO` model for some datasets, we defined a customized gridsearch only for this model, which consumes less memory than other methods such as gridsearchCV.
+### Optimization with bash
+
+Due to the high memory usage of the `GBDT-MO` model we provided a script in bash to do the gridsearch out of the python. This approach consumes less memory than python.
+For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) directory.
+With this approach, we include the grid inside the bash file, and by calling the python file, it trains the model with new arguments and stores the validation score in a separate file. For the test part, it trains the best_estimator with the optimum arguments and returns the generalization score.
+
+
+
+### Cross-validation only
+We also defined a customized Cross-validation only for `GBDT-MO`, which consumes less memory.
+<h5> Note that this part only considers the train and validation and does not have the final test training. </h5>
+<h5> Please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) optimization for tuning the `GBDT-MO` hyperparameters. </h5>
 The [Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py) method, manage the gridsearchCV for the GBDT-MO model with the following param_grid;
 ```Python
 param_grid = {"max_depth": [2, 5, 10, 20],
@@ -85,9 +94,7 @@ Note this class ([Optimize_gbdtmo_wrapper](Optimize_gbdtmo_wrapper.py)) `GBDT-MO
 
 This gridsearch is designed to work only for the wrapper of `GBDT-MO`, if you want to do the grid search without using the wrapper, please refer to the [optimize_gbdtmo](optimize_gbdtmo.py).
 
-We also provided another script in bash to do the gridsearch out of the python. This approach consumes less memory than python.
-For this matter, you have to run your python file by calling it with the bash script. To access this approach, please refer to the [bash](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/bash) directory.
-With this approach, we include the grid inside the bash file, and by calling the python file, it trains the model with new arguments and stores the validation score in a separate file. For the test part, it trains the best_estimator with the optimum arguments and returns the generalization score.
+
 
 
 ## Scoring function
