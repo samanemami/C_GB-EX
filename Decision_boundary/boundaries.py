@@ -96,3 +96,6 @@ plotModel_MultiClass(x_train, y_train, mart, title="MART")
 
 plt.subplot(1, 3, 3)
 plotModel_MultiClass(x_train, y_train, model_gbdtmo, title="GBDT-MO")
+
+# Add the TFBT plot here!
+# Update the predict method in TFBT
