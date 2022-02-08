@@ -1,5 +1,6 @@
 # C_GB-EX
 Condensed Gradient Boosting Decision Tree - Examples
+![![Tree](https://github.com/samanemami/C_GB-EX/blob/main/docs/C_GB_Tree.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/C_GB_Tree.jpg)
 
 # About
 This project has four main purposes:
