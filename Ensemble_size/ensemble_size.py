@@ -50,7 +50,7 @@ print(sum(tree.tree_.n_leaves for tree in mart.estimators_.reshape(-1)))
 params = {"max_depth": max_depth,
           "lr": 0.1,
           'loss': b"ce",
-          'verbose': True,
+          'verbose': False,
           'seed': random_state}
 
 
