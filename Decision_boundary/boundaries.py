@@ -64,12 +64,12 @@ mart = GradientBoostingClassifier(max_depth=20,
 mart.fit(x_train, y_train)
 
 
-model_gbdtmo = classification(max_depth=10,
+model_gbdtmo = classification(max_depth=20,
                               learning_rate=0.1,
                               random_state=1,
                               num_boosters=100,
                               lib=path,
-                              subsample=1.0,
+                              subsample=0.75,
                               verbose=False,
                               num_eval=0
                               )
