@@ -1,12 +1,12 @@
 import numpy as np
 import sklearn.datasets as dt
-from sklearn.model_selection import train_test_split
+from gbdtmo import GBDTMulti, load_lib
 from Scikit_CGB import C_GradientBoostingClassifier
-from gbdtmo import GBDTMulti, load_lib, create_graph
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.preprocessing import LabelEncoder, Normalizer
 
-X, y = dt.load_iris(return_X_y=True)
+
+X, y = dt.load_digits(return_X_y=True)
 n_class = len(np.unique(y))
 
 max_depth = 5
@@ -54,14 +54,6 @@ params = {"max_depth": max_depth,
           'seed': random_state}
 
 
-lb = LabelEncoder()
-scl = Normalizer()
-
-y_test = lb.fit_transform(y_test)
-x_train = scl.fit_transform(x_train)
-x_test = scl.fit_transform(x_test)
-y_train = lb.fit_transform(y_train)
-
 x_train, y_train = np.ascontiguousarray(
     x_train, dtype=np.float64), y_train.astype(np.int32)
 x_test, y_test = np.ascontiguousarray(
@@ -71,14 +63,11 @@ x_test, y_test = np.ascontiguousarray(
 booster = GBDTMulti(lib, out_dim=n_class, params=params)
 booster.set_data((x_train, y_train), (x_test, y_test))
 booster.train(100)
-booster.dump(b"iris.txt")
-
-graph = create_graph("iris.txt", 1, [0, n_class-1])
-graph.render("Tree", format='pdf')
+booster.dump(b"digits.txt")
 
 tree_index = 100
 nodes = []
-dumped_model = "iris.txt"
+dumped_model = "digits.txt"
 gbdtmo_nodes = []
 for i in range(tree_index):
     with open(dumped_model, "r") as f:
@@ -97,4 +86,3 @@ for i in range(tree_index):
 
 print('GBDT-MO Leaves')
 print(len(gbdtmo_nodes[tree_index-1]))
-
