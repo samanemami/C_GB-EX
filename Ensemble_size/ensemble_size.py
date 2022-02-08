@@ -11,7 +11,7 @@ n_class = len(np.unique(y))
 
 max_depth = 5
 random_state = 1
-path = '/lustre/home/samanema/.local/lib/python3.6/site-packages/gbdtmo/build/gbdtmo.so'
+path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 lib = load_lib(path)
 
 
