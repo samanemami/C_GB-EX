@@ -2,5 +2,7 @@ In this part, we are trying to estimate the size of the ensemble and have a comp
 
 One approach besides the memory consumption is to count the number of leaves in the ensemble. It is easy to see that a tree with fewer leaves is shorter and leed to a smaller ensemble.
 
-By counting the leaves of each tree and summing them, we will have the total number of leaves in the ensemble.
+By counting the leaves of each tree and summing them, we will have the total number of leaves in the ensemble. [ensemble_size](ensemble_size.py)
 The proposed C_GB method, MART, and GBDT-MO can count the leaves of each tree. The example includes the digits dataset to calculate the entire leaves.
+
+Note that various settings of the model led to the different decision trees. For this matter, we considered the same values for all models' hyper-parameters and ran the model for different tree depths.
