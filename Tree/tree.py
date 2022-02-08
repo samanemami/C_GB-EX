@@ -71,7 +71,7 @@ def gbdtmo(tree_id=0, max_depth=3, random_state=1):
     X, y = np.ascontiguousarray(
         x_train, dtype=np.float64), y_train.astype(np.int32)
 
-    path = '/lustre/home/samanema/.local/lib/python3.6/site-packages/gbdtmo/build/gbdtmo.so'
+    path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so' # Path to lib
     lib = load_lib(path)
 
     booster = GBDTMulti(lib, out_dim=len(np.unique(y_train)), params=params)
