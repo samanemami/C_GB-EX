@@ -2,7 +2,6 @@ import numpy as np
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from wrapper import classification
-from TFBT import BoostedTreesClassifier
 from sklearn.model_selection import train_test_split
 from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
@@ -77,15 +76,7 @@ model_gbdtmo = classification(max_depth=10,
 model_gbdtmo.fit(x_train, y_train)
 
 
-model_tfbt = BoostedTreesClassifier(label_vocabulary=None,
-                                    n_trees=100,
-                                    max_depth=10,
-                                    learning_rate=0.1,
-                                    steps=100,
-                                    model_dir= tfbt_path,
-                                    )
 
-model_tfbt.fit(x_train, y_train)
 
 plt.figure(num=1, figsize=(20, 7))
 plt.subplot(1, 3, 1)
@@ -96,6 +87,3 @@ plotModel_MultiClass(x_train, y_train, mart, title="MART")
 
 plt.subplot(1, 3, 3)
 plotModel_MultiClass(x_train, y_train, model_gbdtmo, title="GBDT-MO")
-
-# Add the TFBT plot here!
-# Update the predict method in TFBT
