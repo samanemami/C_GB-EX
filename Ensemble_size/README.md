@@ -6,3 +6,5 @@ By counting the leaves of each tree and summing them, we will have the total num
 The proposed C_GB method, MART, and GBDT-MO can count the leaves of each tree. The example includes the digits dataset to calculate the entire leaves.
 
 Note that various settings of the model led to the different decision trees. For this matter, we considered the same values for all models' hyper-parameters and ran the model for different tree depths.
+
+[ensemble_size](ensemble_size.py) is just an example of a digits dataset. It extends for different datasets and methods as well.
