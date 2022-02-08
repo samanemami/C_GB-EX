@@ -11,7 +11,7 @@ n_class = len(np.unique(y))
 
 max_depth = 5
 random_state = 1
-path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
+path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so' # Path to the dynamic library of gbdtmo
 lib = load_lib(path)
 
 
