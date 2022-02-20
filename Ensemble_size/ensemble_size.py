@@ -11,7 +11,8 @@ n_class = len(np.unique(y))
 
 max_depth = 5
 random_state = 1
-path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so' # Path to the dynamic library of gbdtmo
+# Path to the dynamic library of gbdtmo
+path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 lib = load_lib(path)
 
 
@@ -68,7 +69,6 @@ booster.dump(b"digits.txt")
 tree_index = 100
 nodes = []
 dumped_model = "digits.txt"
-gbdtmo_nodes = []
 for i in range(tree_index):
     with open(dumped_model, "r") as f:
         tree = f.read().split("Booster")
@@ -82,7 +82,7 @@ for i in range(tree_index):
             node = int(line.pop(0))
             if node > 0:
                 nodes.append(node)
-    gbdtmo_nodes.append(nodes)
+
 
 print('GBDT-MO Leaves')
-print(len(gbdtmo_nodes[tree_index-1]))
+print(len(nodes))
