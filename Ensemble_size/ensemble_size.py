@@ -67,10 +67,9 @@ booster.set_data((x_train, y_train), (x_test, y_test))
 booster.train(n_estimator)
 booster.dump(b"digits.txt")
 
-tree_index = n_estimator
 nodes = []
 dumped_model = "digits.txt"
-for i in range(tree_index):
+for i in range(n_estimator):
     with open(dumped_model, "r") as f:
         tree = f.read().split("Booster")
         tree.pop(0)
