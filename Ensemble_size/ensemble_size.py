@@ -11,6 +11,7 @@ n_class = len(np.unique(y))
 
 max_depth = 5
 random_state = 1
+n_estimator = 100
 # Path to the dynamic library of gbdtmo
 path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 lib = load_lib(path)
@@ -27,7 +28,7 @@ cgb = C_GradientBoostingClassifier(max_depth=max_depth,
                                    random_state=random_state,
                                    criterion="mse",
                                    loss="deviance",
-                                   n_estimators=1)
+                                   n_estimators=n_estimator)
 
 
 cgb.fit(x_train, y_train)
@@ -41,7 +42,7 @@ mart = GradientBoostingClassifier(max_depth=max_depth,
                                   learning_rate=0.1,
                                   random_state=random_state,
                                   criterion="mse",
-                                  n_estimators=1)
+                                  n_estimators=n_estimator)
 
 mart.fit(x_train, y_train)
 print('MART Leaves')
@@ -63,10 +64,10 @@ x_test, y_test = np.ascontiguousarray(
 
 booster = GBDTMulti(lib, out_dim=n_class, params=params)
 booster.set_data((x_train, y_train), (x_test, y_test))
-booster.train(100)
+booster.train(n_estimator)
 booster.dump(b"digits.txt")
 
-tree_index = 100
+tree_index = n_estimator
 nodes = []
 dumped_model = "digits.txt"
 for i in range(tree_index):
