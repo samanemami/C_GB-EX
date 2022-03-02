@@ -40,7 +40,7 @@ t_cgb = (process_time()-t0)
 t0 = process_time()
 for i in range(100):
     cgb.predict(x_test)
-p_cgb = process_time() - t0 / (100 * (x_test.shape[0]))
+p_cgb = (process_time() - t0) / (100 * (x_test.shape[0]))
 
 mart = GradientBoostingClassifier(max_depth=max_depth,
                                   subsample=1,
@@ -58,7 +58,7 @@ t_mart = (process_time()-t0)
 t0 = process_time()
 for i in range(100):
     mart.predict(x_test)
-p_mart = process_time() - t0 / (100 * (x_test.shape[0]))
+p_mart = (process_time() - t0) / (100 * (x_test.shape[0]))
 
 tfbt = BoostedTreesClassifier(label_vocabulary=None,
                               n_trees=100,
@@ -76,7 +76,7 @@ t_tfbt = (tfbt._model_complexity()[0])
 t0 = process_time()
 for i in range(100):
     tfbt.score(x_test, y_test)
-p_tfbt = process_time() - t0 / (100 * (x_test.shape[0]))
+p_tfbt = (process_time() - t0) / (100 * (x_test.shape[0]))
 
 
 params = {"max_depth": max_depth,
@@ -105,7 +105,7 @@ t_gbdtmo = (process_time()-t0)
 t0 = process_time()
 for i in range(100):
     np.argmax(booster.predict(x_test), axis=1)
-p_gbdtmo = process_time() - t0 / (100 * (x_test.shape[0]))
+p_gbdtmo = (process_time() - t0) / (100 * (x_test.shape[0]))
 
 
 result = {}
