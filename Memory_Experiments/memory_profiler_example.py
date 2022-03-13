@@ -6,11 +6,15 @@ from gbdtmo import GBDTMulti, load_lib
 from TFBT import BoostedTreesClassifier
 from sklearn import datasets as dts
 from memory_profiler import profile
+import warnings
+
+
+warnings.simplefilter("ignore")
 
 
 X, y = dts.load_digits(return_X_y=True)
 
-x_train, y_train, x_test, y_test = train_test_split(
+x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=1)
 
 
