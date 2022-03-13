@@ -1,4 +1,5 @@
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
 from Scikit_CGB import C_GradientBoostingClassifier
 from wrapper import regression, classification
 from gbdtmo import GBDTMulti, load_lib
@@ -8,6 +9,11 @@ from memory_profiler import profile
 
 
 X, y = dts.load_digits(return_X_y=True)
+
+x_train, y_train, x_test, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=1)
+
+
 path = 'path to so lib'
 
 @profile
@@ -21,7 +27,7 @@ def cgb():
                                        loss="deviance",
                                        n_estimators=100)
 
-  model.fit(X, y)
+  model.fit(x_train, y_train)
 
 @profile
 def gbdtmo():
@@ -34,7 +40,7 @@ def gbdtmo():
                            verbose=False,
                            num_eval=0
                            )
-    model.fit(X, y)
+    model.fit(x_train, y_train)
 
 @profile
 def mart():
@@ -46,7 +52,7 @@ def mart():
                                      criterion="mse",
                                      loss="deviance",
                                      n_estimators=100)
-  model.fit(X, y)
+  model.fit(x_train, y_train)
 
 @profile
 def tfbt():
@@ -57,7 +63,7 @@ def tfbt():
                                  steps=100,
                                  model_dir=None
                                  )
-  model.fit(X, y)
+  model.fit(x_train, y_train)
 
 
 if __name__ == '__main__':
