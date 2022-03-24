@@ -2,9 +2,9 @@
 
 We defined an optimization class, including cross-validation and stratified sampling for each model and problem.
 
-## stratified sampling
+## Stratified sampling
 
-The number of instances for all the experiments and models is the same, and the results are comparable. We considered the stratified approach to split the datasets and cv_intrain = 2 for in train epoch of finding the best hyperparameters. You can find the related illustrations here. For the C-GB, MART, and TFBT, the example provided in pure python, and for the GBDT-MO, you need to run the bash file first.
+The number of instances for all the experiments and models is the same, and the results are comparable. We considered the stratified approach to split the datasets and cv_intrain = 2 for in train epoch of finding the best hyperparameters. You can find the related illustrations [here](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/stratified_sampling). For the C-GB, MART, and TFBT, the example provided in pure [python](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/stratified_sampling/py), and for the GBDT-MO, you need to run the bash [file](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/stratified_sampling/bash_gbdtmo) first.
 
 ### Optimization with bash
 
@@ -90,3 +90,7 @@ The scoring we used for different problems to find a better grid are as follows;
   <li> regression: RMSE</li>
   <li> Multioutput-Regression: r2, RMSE</li>
 </ul>
+
+<hr>
+
+* There are extra examples in this [directory](https://github.com/samanemami/C_GB-EX/tree/main/Optimization/cross_validation) as well.
