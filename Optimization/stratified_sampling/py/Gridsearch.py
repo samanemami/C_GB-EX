@@ -53,8 +53,6 @@ def gridsearch(X, y, model, grid,
     results['score_time'] = grid_search.cv_results_[
         'mean_score_time'][grid_search.best_index_]
 
-    pd.DataFrame(results).to_csv(title + scoring_functions + '_Summary.csv')
-    pd.DataFrame(cv_results).to_csv(
-        title + scoring_functions + '_CV_results.csv')
-    pd.DataFrame(bestparams).to_csv(
-        title + scoring_functions + '- Best_Parameters.csv')
+    pd.DataFrame(results).to_csv(title +'_Summary.csv')
+    pd.DataFrame(cv_results).to_csv(title + '_CV_results.csv')
+    pd.DataFrame(bestparams).to_csv(title + '_Best_Parameters.csv')
