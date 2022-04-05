@@ -6,7 +6,7 @@ from gbdtmo import GBDTMulti, load_lib
 from TFBT import BoostedTreesClassifier
 from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingClassifier
+from mart import GradientBoostingClassifier
 
 
 X, y = dt.load_digits(return_X_y=True)
