@@ -8,7 +8,7 @@ from sklearn.model_selection import ShuffleSplit
 from TFBT import BoostedTreesClassifier
 from Scikit_CGB import C_GradientBoostingClassifier
 from gbdtmo_wrapper import regression, classification
-from sklearn.ensemble import GradientBoostingClassifier
+from mart import GradientBoostingClassifier
 
 X, y = dt.load_iris(return_X_y=True)
 
