@@ -19,7 +19,7 @@ X, y = dts.make_classification(n_features=2,
                                random_state=2,
                                n_clusters_per_class=1,
                                n_classes=n_classes,
-                               n_samples=500,
+                               n_samples=200,
                                flip_y=0.15)
 
 
@@ -100,6 +100,6 @@ def gbdtmo(tree_id=0, max_depth=3, random_state=1):
 
 
 if __name__ == "__main__":
-    cgb(tree_id=0, max_depth=3, random_state=1)
-    mart(tree_id=0, max_depth=3, random_state=1)
-    gbdtmo(tree_id=0, max_depth=3, random_state=1)
+    cgb(tree_id=0, max_depth=2, random_state=1)
+    mart(tree_id=0, max_depth=2, random_state=1)
+    gbdtmo(tree_id=0, max_depth=2, random_state=1)
