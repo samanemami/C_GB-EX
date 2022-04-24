@@ -36,8 +36,6 @@ X, y = dts.make_classification(n_features=2,
 
 plt.scatter(X[:, 0], X[:, 1], c=y)
 
-x_train, x_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=1)
 
 path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 tfbt_path = "Path_to_remove_tf_logs"
@@ -50,7 +48,7 @@ c_gb = C_GradientBoostingClassifier(max_depth=20,
                                     criterion="mse",
                                     n_estimators=100)
 
-c_gb.fit(x_train, y_train)
+c_gb.fit(X, y)
 
 
 mart = GradientBoostingClassifier(max_depth=20,
@@ -61,7 +59,7 @@ mart = GradientBoostingClassifier(max_depth=20,
                                   criterion="mse",
                                   n_estimators=100)
 
-mart.fit(x_train, y_train)
+mart.fit(X, y)
 
 
 model_gbdtmo = classification(max_depth=20,
@@ -71,19 +69,17 @@ model_gbdtmo = classification(max_depth=20,
                               lib=path,
                               subsample=0.75,
                               verbose=False,
-                              num_eval=0
-                              )
-model_gbdtmo.fit(x_train, y_train)
+                              num_eval=0)
 
-
+model_gbdtmo.fit(X, y)
 
 
 plt.figure(num=1, figsize=(20, 7))
 plt.subplot(1, 3, 1)
-plotModel_MultiClass(x_train, y_train, c_gb, title="C-GB")
+plotModel_MultiClass(X, y, c_gb, title="C-GB")
 
 plt.subplot(1, 3, 2)
-plotModel_MultiClass(x_train, y_train, mart, title="MART")
+plotModel_MultiClass(X, y, mart, title="MART")
 
 plt.subplot(1, 3, 3)
-plotModel_MultiClass(x_train, y_train, model_gbdtmo, title="GBDT-MO")
+plotModel_MultiClass(X, y, model_gbdtmo, title="GBDT-MO")
