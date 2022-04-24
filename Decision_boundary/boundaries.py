@@ -31,7 +31,7 @@ X, y = dts.make_classification(n_features=2,
                                random_state=2,
                                n_clusters_per_class=1,
                                n_classes=3,
-                               n_samples=1300,
+                               n_samples=1040,
                                flip_y=0.15)
 
 plt.scatter(X[:, 0], X[:, 1], c=y)
