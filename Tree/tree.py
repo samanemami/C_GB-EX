@@ -11,18 +11,16 @@ from sklearn.ensemble import GradientBoostingClassifier
 warnings.simplefilter("ignore")
 np.random.seed(1)
 
+n_classes = 3
+
 X, y = dts.make_classification(n_features=2,
                                n_redundant=0,
                                n_informative=2,
                                random_state=2,
                                n_clusters_per_class=1,
-                               n_classes=2,
+                               n_classes=n_classes,
                                n_samples=500,
                                flip_y=0.15)
-
-
-x_train, x_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=1)
 
 
 def cgb(tree_id=0, max_depth=3, random_state=1):
@@ -32,9 +30,12 @@ def cgb(tree_id=0, max_depth=3, random_state=1):
                                          learning_rate=0.1,
                                          random_state=random_state,
                                          n_estimators=100)
-    model.fit(x_train, y_train)
+    model.fit(X, y)
     tree = model.estimators_.reshape(-1)[tree_id]
     print("number of leaves:", tree.tree_.n_leaves)
+    # Storing class labels for further applications
+    class_names = []
+    [class_names.append(str(i)) for i in model.classes_]
     plot_tree(tree)
     plt.savefig('C_GB_Tree.jpg', dpi=500)
     plt.close("all")
@@ -49,19 +50,15 @@ def mart(tree_id=0, max_depth=3, random_state=1):
                                        criterion="mse",
                                        n_estimators=100)
 
-    model.fit(x_train, y_train)
-    tree1 = model.estimators_.reshape(-1)[tree_id]
-    tree2 = model.estimators_.reshape(-1)[tree_id + 1]
+    model.fit(X, y)
+    # Plot decision tree regressor for each class
+    for i in range(n_classes):
+        tree = model.estimators_.reshape(-1)[tree_id + i]
 
-    print("number of leaves_Tree1:", tree1.tree_.n_leaves)
-    plot_tree(tree1)
-    plt.savefig('MART_Tree1.jpg', dpi=500)
-    plt.close("all")
-
-    print("number of leaves_Tree2:", tree2.tree_.n_leaves)
-    plot_tree(tree2)
-    plt.savefig('MART_Tree2.jpg', dpi=500)
-    plt.close("all")
+        print("number of leaves_Tree1:", tree.tree_.n_leaves)
+        plot_tree(tree)
+        plt.savefig('MART_Tree' + str(i) + '.jpg', dpi=500)
+        plt.close("all")
 
 
 def gbdtmo(tree_id=0, max_depth=3, random_state=1):
@@ -69,18 +66,18 @@ def gbdtmo(tree_id=0, max_depth=3, random_state=1):
               'loss': b"ce", 'verbose': False, 'seed': random_state}
 
     X, y = np.ascontiguousarray(
-        x_train, dtype=np.float64), y_train.astype(np.int32)
+        X, dtype=np.float64), y.astype(np.int32)
 
-    path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so' # Path to lib
+    path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'  # Path to lib
     lib = load_lib(path)
 
-    booster = GBDTMulti(lib, out_dim=len(np.unique(y_train)), params=params)
+    booster = GBDTMulti(lib, out_dim=len(np.unique(y)), params=params)
     booster.set_data((X, y))
     booster.train(100)
 
     booster.dump(b"dumpmodel.txt")
     graph = create_graph("dumpmodel.txt", tree_id, [
-                         0, len(np.unique(y_train))-1])
+                         0, len(np.unique(y))-1])
     graph.render("GBDTMO_Tree", format='jpg')
 
     nodes = []
