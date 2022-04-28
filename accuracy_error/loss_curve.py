@@ -48,7 +48,7 @@ def loss_curve(max_depth=2, n_classes=3):
     plt.plot(c_gb.train_score_, color='b', alpha=0.4, label='C-GB')
     plt.title('Max depth=' + str(max_depth))
     plt.xlabel('Boosting iteration')
-    plt.ylabel('Training error')
+    plt.ylabel('Training loss')
     plt.grid(visible=True, alpha=0.3)
 
 
