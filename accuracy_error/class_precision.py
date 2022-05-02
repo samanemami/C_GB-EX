@@ -8,7 +8,7 @@ import warnings
 
 
 # Dataset Entry
-waveform = np.loadtxt(waveform.data', delimiter=',')
+waveform = np.loadtxt('waveform.data', delimiter=',')
 X = waveform[:, :-1]
 y = waveform[:, -1]
 n_class = len(np.unique(y))
