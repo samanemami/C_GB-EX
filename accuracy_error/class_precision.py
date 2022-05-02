@@ -55,7 +55,6 @@ def model_training(X, y, max_depth, T):
                                       criterion="mse",
                                       n_estimators=T)
     mart.fit(x_train, y_train)
-    pred = mart.predict(x_test)
 
     #  Training the proposed condensed method
     c_gb = C_GradientBoostingClassifier(max_depth=max_depth,
@@ -66,7 +65,6 @@ def model_training(X, y, max_depth, T):
                                         criterion="mse",
                                         n_estimators=T)
     c_gb.fit(x_train, y_train)
-    pred = c_gb.predict(x_test)
 
     precision_c_gb = np.zeros((T, n_class))
     precision_mart = np.zeros((T, n_class))
