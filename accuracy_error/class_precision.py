@@ -5,7 +5,7 @@ from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings
-
+warnings.simplefilter('ignore')
 
 # Dataset Entry
 waveform = np.loadtxt('waveform.data', delimiter=',')
@@ -39,7 +39,7 @@ def model_training(X, y, max_depth, T):
 
     """
 
-    warnings.simplefilter('ignore')
+    
 
     n_class = len(np.unique(y))
 
