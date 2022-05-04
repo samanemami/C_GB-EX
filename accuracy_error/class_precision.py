@@ -5,9 +5,6 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-import sys
-sys.path.append(r'D:\Academic\Ph.D\Programming\Py\PhD Thesis\Scikit_CGB')
-
 
 def model_training(X, y, max_depth, T, random_state):
     """ Training the C-GB and MART models.
