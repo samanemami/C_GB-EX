@@ -83,8 +83,9 @@ if __name__ == '__main__':
 
     # Dataset Entry
     waveform = np.loadtxt(
-        r'D:\Academic\Ph.D\Programming\DataBase\PhD Thesis\Classification\Multiclass\waveform.data',
-        delimiter=',')
+        'waveform.data',
+        delimiter=','
+        )
     X = waveform[:, :-1]
     y = waveform[:, -1]
 
