@@ -5,6 +5,8 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+import sys
+sys.path.append(r'D:\Academic\Ph.D\Programming\Py\PhD Thesis\Scikit_CGB')
 
 
 def model_training(X, y, max_depth, T, random_state):
@@ -58,16 +60,17 @@ def model_training(X, y, max_depth, T, random_state):
 
     precision_c_gb = np.zeros((T, n_class))
     precision_mart = np.zeros((T, n_class))
+    target_names = ['class '+str(i) for i in range(n_class)]
 
     for _, pred in enumerate(c_gb.staged_predict(x_test)):
-        report = classification_report(y_test, pred, output_dict=True, target_names=[
-            'class 0', 'class 1', 'class 2'])
+        report = classification_report(
+            y_test, pred, output_dict=True, target_names=target_names)
         for i in range(n_class):
             precision_c_gb[_, i] = report['class ' + str(i)]['precision']
 
     for _, pred in enumerate(mart.staged_predict(x_test)):
-        report = classification_report(y_test, pred, output_dict=True, target_names=[
-            'class 0', 'class 1', 'class 2'])
+        report = classification_report(
+            y_test, pred, output_dict=True, target_names=target_names)
         for i in range(n_class):
             precision_mart[_, i] = report['class ' + str(i)]['precision']
 
@@ -82,12 +85,11 @@ if __name__ == '__main__':
     warnings.simplefilter('ignore')
 
     # Dataset Entry
-    waveform = np.loadtxt(
-        'waveform.data',
-        delimiter=','
-        )
-    X = waveform[:, :-1]
-    y = waveform[:, -1]
+    vehicle = np.loadtxt(
+        'vehicle.data',
+        delimiter=',')
+    X = vehicle[:, :-1]
+    y = vehicle[:, -1]
 
     # Number of class labels
     n_class = len(np.unique(y))
@@ -114,11 +116,11 @@ if __name__ == '__main__':
         c_gb = c_gb/n
         mart = mart/n
 
-        fig, axes = plt.subplots(4, 3, figsize=(15, 3))
+        fig, axes = plt.subplots(4, n_class, figsize=(15, 3))
         plt.tight_layout()
 
         for i in range(n_class):
-            plt.subplot(1, 3, i+1)
+            plt.subplot(1, n_class, i+1)
             plt.plot(mart[:, i],
                      label='MART', color='r')
             plt.plot(c_gb[:, i],
@@ -128,7 +130,7 @@ if __name__ == '__main__':
             plt.ylabel('class Precision')
             plt.yticks(np.arange(0.0, 0.9, step=0.05))
             plt.autoscale(enable=True, axis='both')
-            plt.suptitle('Max depth=' + str(j))
+            # plt.suptitle('Max depth=' + str(j))
             plt.title('class ' + str(i))
             plt.tight_layout()
             plt.legend()
