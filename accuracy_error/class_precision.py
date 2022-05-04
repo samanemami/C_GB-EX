@@ -1,24 +1,13 @@
-from sklearn.ensemble import GradientBoostingClassifier
-from Scikit_CGB import C_GradientBoostingClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-import matplotlib.pyplot as plt
-import numpy as np
 import warnings
-warnings.simplefilter('ignore')
-
-# Dataset Entry
-waveform = np.loadtxt('waveform.data', delimiter=',')
-X = waveform[:, :-1]
-y = waveform[:, -1]
-n_class = len(np.unique(y))
-
-
-max_depth = 5
-T = 100
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from Scikit_CGB import C_GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 
 
-def model_training(X, y, max_depth, T):
+def model_training(X, y, max_depth, T, random_state):
     """ Training the C-GB and MART models.
 
     Trains two multi-class classification models.
@@ -39,21 +28,21 @@ def model_training(X, y, max_depth, T):
 
     """
 
-    
-
+    np.random.seed(random_state)
     n_class = len(np.unique(y))
 
     x_train, x_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=1)
+        X, y, test_size=0.2, random_state=random_state)
 
     # training the Mart
     mart = GradientBoostingClassifier(max_depth=max_depth,
                                       subsample=0.75,
                                       max_features="sqrt",
                                       learning_rate=0.1,
-                                      random_state=1,
+                                      random_state=random_state,
                                       criterion="mse",
-                                      n_estimators=T)
+                                      n_estimators=T
+                                      )
     mart.fit(x_train, y_train)
 
     #  Training the proposed condensed method
@@ -61,9 +50,10 @@ def model_training(X, y, max_depth, T):
                                         subsample=0.75,
                                         max_features="sqrt",
                                         learning_rate=0.1,
-                                        random_state=1,
+                                        random_state=random_state,
                                         criterion="mse",
-                                        n_estimators=T)
+                                        n_estimators=T
+                                        )
     c_gb.fit(x_train, y_train)
 
     precision_c_gb = np.zeros((T, n_class))
@@ -88,20 +78,49 @@ def model_training(X, y, max_depth, T):
 # color =next(colors)
 
 
-
 if __name__ == '__main__':
+    warnings.simplefilter('ignore')
+
+    # Dataset Entry
+    waveform = np.loadtxt(
+        r'D:\Academic\Ph.D\Programming\DataBase\PhD Thesis\Classification\Multiclass\waveform.data',
+        delimiter=',')
+    X = waveform[:, :-1]
+    y = waveform[:, -1]
+
+    # Number of class labels
+    n_class = len(np.unique(y))
+
+    # Number of base learners
+    T = 100
+
+    # define how much it trains the model
+    n = 10
+
+    # Train the models for different values of the maximum depth
     for _, j in enumerate([2, 5, 10, 20]):
+        c_gb = np.zeros((100, n_class))
+        mart = np.zeros((100, n_class))
+
+        for i in range(n):
+            precision_c_gb, precision_mart = model_training(X=X,
+                                                            y=y,
+                                                            max_depth=j,
+                                                            T=T,
+                                                            random_state=i)
+            c_gb += precision_c_gb
+            mart += precision_mart
+        c_gb = c_gb/n
+        mart = mart/n
+
         fig, axes = plt.subplots(4, 3, figsize=(15, 3))
         plt.tight_layout()
-        precision_c_gb, precision_mart = model_training(X=X,
-                                                        y=y,
-                                                        max_depth=j,
-                                                        T=100)
+
         for i in range(n_class):
             plt.subplot(1, 3, i+1)
-            plt.plot(precision_mart[:, i],
+            plt.plot(mart[:, i],
                      label='MART', color='r')
-            plt.plot(precision_c_gb[:, i],
+            plt.plot(c_gb[:, i],
                      label='C-GB', color='b')
             plt.grid(True, alpha=0.7)
             plt.xlabel('Boosting iteration')
@@ -112,4 +131,5 @@ if __name__ == '__main__':
             plt.title('class ' + str(i))
             plt.tight_layout()
             plt.legend()
-        plt.savefig('depth' + str(j)+'.jpg', dpi=700)
+        plt.savefig('precision' + str(j)+'.eps')
+        print('*', end='')
