@@ -1,11 +1,11 @@
-from sklearn.ensemble import GradientBoostingRegressor
-from Scikit_CGB import C_GradientBoostingRegressor
-from sklearn.model_selection import KFold
-from sklearn.metrics import r2_score
-import matplotlib.pyplot as plt
-import sklearn.datasets as dts
-import numpy as np
 import warnings
+import numpy as np
+import sklearn.datasets as dts
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score
+from sklearn.model_selection import train_test_split
+from Scikit_CGB import C_GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 
 warnings.simplefilter('ignore')
@@ -17,44 +17,36 @@ X, y = dts.make_regression(n_samples=200,
                            random_state=random_state)
 
 
-kfold = KFold(n_splits=10,
-              shuffle=True,
-              random_state=random_state
-              )
+def reg(X, y, max_depth, random_state):
 
+    x_train, x_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=random_state)
 
-def reg(max_depth=2):
+    pred_mart = np.zeros_like(y_test)
 
-    pred_mart = np.zeros_like(y)
-    pred_cgb = np.zeros_like(y)
+    c_gb = C_GradientBoostingRegressor(max_depth=max_depth,
+                                       subsample=0.75,
+                                       max_features="sqrt",
+                                       learning_rate=0.1,
+                                       random_state=random_state,
+                                       criterion="mse",
+                                       n_estimators=100)
 
-    for _, (train_index, test_index) in enumerate(kfold.split(X, y)):
-        x_train, x_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
+    c_gb.fit(x_train, y_train)
+    pred_cgb = c_gb.predict(x_test)
 
-        c_gb = C_GradientBoostingRegressor(max_depth=max_depth,
-                                           subsample=1,
-                                           max_features="sqrt",
-                                           learning_rate=0.1,
-                                           random_state=1,
-                                           criterion="mse",
-                                           n_estimators=100)
+    mart = GradientBoostingRegressor(max_depth=max_depth,
+                                     subsample=0.75,
+                                     max_features="sqrt",
+                                     learning_rate=0.1,
+                                     random_state=random_state,
+                                     criterion="mse",
+                                     n_estimators=100)
+    for i in range(y.shape[1]):
+        mart.fit(x_train, y_train[:, i])
+        pred_mart[:, i] = mart.predict(x_test)
 
-        c_gb.fit(x_train, y_train)
-        pred_cgb[test_index] = c_gb.predict(x_test)
-
-        mart = GradientBoostingRegressor(max_depth=max_depth,
-                                         subsample=1,
-                                         max_features="sqrt",
-                                         learning_rate=0.1,
-                                         random_state=1,
-                                         criterion="mse",
-                                         n_estimators=100)
-        for i in range(y.shape[1]):
-            mart.fit(x_train, y_train[:, i])
-            pred_mart[test_index, i] = mart.predict(x_test)
-
-    return pred_cgb, pred_mart
+    return pred_cgb, pred_mart, y_test
 
 
 def scatter(y, pred_cgb, pred_mart):
@@ -98,12 +90,33 @@ def scatter(y, pred_cgb, pred_mart):
 
 if __name__ == '__main__':
 
+    n = 10
     plt.figure(figsize=(10, 7))
-    for i, j in enumerate([2, 5, 10, 20]):
-        pred_cgb, pred_mart = reg(max_depth=j)
-        plt.subplot(2, 2, i+1)
-        scatter(y, pred_cgb, pred_mart)
+    for _, j in enumerate([2, 5, 10, 20]):
+        y_test = reg(X=X,
+                     y=y,
+                     max_depth=j,
+                     random_state=i)[2]
+
+        cgb = np.zeros_like(y_test)
+        mart = np.zeros_like(y_test)
+        Y = np.zeros_like(y_test)
+        for i in range(n):
+            pred_cgb, pred_mart, y_test = reg(X=X,
+                                              y=y,
+                                              max_depth=j,
+                                              random_state=i)
+            cgb += pred_cgb
+            mart += pred_mart
+            Y += y_test
+
+        pred_cgb = cgb / n
+        pred_mart = mart / n
+        Y = Y/n
+
+        plt.subplot(2, 2, _+1)
+        scatter(Y, pred_cgb, pred_mart)
         plt.suptitle('Comparing C-GB and MART Regressors')
         plt.title('Max depth=' + str(j))
     plt.subplots_adjust(hspace=0.3, wspace=.3)
-    plt.savefig('Scatter_regression.eps')
+    plt.savefig('Scatter_regression.jpg', dpi=700)
