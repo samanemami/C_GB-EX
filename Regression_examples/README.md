@@ -1,5 +1,8 @@
 # Regression examples
 
+
+![![Regression](https://github.com/samanemami/C_GB-EX/blob/main/docs/Scatter_regression.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/Scatter_regression.jpg)
+
 The related examples for the multi-output regression problem are included here. 
 
 The [Regression_examples](Regression_examples.py) illustrates the scatter plot regarding the predicted values of two C-GB and MART models against the real values. 
