@@ -96,7 +96,7 @@ if __name__ == '__main__':
         y_test = reg(X=X,
                      y=y,
                      max_depth=j,
-                     random_state=i)[2]
+                     random_state=_)[2]
 
         cgb = np.zeros_like(y_test)
         mart = np.zeros_like(y_test)
