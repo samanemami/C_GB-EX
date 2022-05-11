@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
         np.savetxt('pred_cgb' + str(j) + '.csv', pred_cgb, delimiter=',')
         np.savetxt('pred_mart' + str(j) + '.csv', pred_mart, delimiter=',')
-        np.savetxt('y_test' + str(j) + '.csv', y_test, delimiter=',')
+        np.savetxt('y_test' + str(j) + '.csv', Y, delimiter=',')
 
         plt.subplot(2, 2, _+1)
         scatter(Y, pred_cgb, pred_mart)
