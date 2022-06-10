@@ -1,6 +1,6 @@
 import TFBT
 import warnings
-import Scikit_CGB
+from cgb import cgb_clf
 import Gridsearch as grid
 import sklearn.datasets as dt
 from sklearn.preprocessing import StandardScaler
@@ -14,14 +14,13 @@ random_state = 1
 cv_intrain = 2
 
 
-cgb = Scikit_CGB.C_GradientBoostingClassifier(max_depth=10,
-                                              subsample=0.75,
-                                              max_features=1,
-                                              learning_rate=0.25,
-                                              random_state=random_state,
-                                              criterion="mse",
-                                              loss="deviance",
-                                              n_estimators=100)
+cgb_ = cgb_clf(max_depth=10,
+               subsample=0.75,
+               max_features=1,
+               learning_rate=0.1,
+               random_state=random_state,
+               n_estimators=100,
+               criterion='squared_error')
 
 
 mart = GradientBoostingClassifier(max_depth=10,
@@ -29,7 +28,7 @@ mart = GradientBoostingClassifier(max_depth=10,
                                   max_features=1,
                                   learning_rate=0.1,
                                   random_state=random_state,
-                                  criterion="mse")
+                                  criterion="squared_error")
 
 
 tfbt = TFBT.BoostedTreesClassifier(label_vocabulary=None,
@@ -54,7 +53,7 @@ if __name__ == "__main__":
 
     grid.gridsearch(X=X,
                     y=y,
-                    model=cgb,
+                    model=cgb_,
                     grid=param_grid,
                     scoring_functions='accuracy',
                     pipeline=('scaler', StandardScaler()),
