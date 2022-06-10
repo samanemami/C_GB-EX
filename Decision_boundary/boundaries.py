@@ -57,7 +57,7 @@ mart = GradientBoostingClassifier(max_depth=5,
                                   max_features="sqrt",
                                   learning_rate=0.1,
                                   random_state=1,
-                                  criterion="mse",
+                                  criterion="squared_error",
                                   n_estimators=100)
 
 mart.fit(X, y)
