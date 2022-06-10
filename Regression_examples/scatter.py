@@ -1,11 +1,12 @@
 import warnings
 import numpy as np
+from cgb import cgb_reg
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 from Scikit_CGB import C_GradientBoostingRegressor
-from sklearn.ensemble import GradientBoostingRegressor
+
 
 
 warnings.simplefilter('ignore')
@@ -24,13 +25,13 @@ def reg(X, y, max_depth, random_state):
 
     pred_mart = np.zeros_like(y_test)
 
-    c_gb = C_GradientBoostingRegressor(max_depth=max_depth,
-                                       subsample=0.75,
-                                       max_features="sqrt",
-                                       learning_rate=0.1,
-                                       random_state=random_state,
-                                       criterion="mse",
-                                       n_estimators=100)
+    c_gb = cgb_reg(max_depth=max_depth,
+               subsample=0.75,
+               max_features="sqrt",
+               learning_rate=0.1,
+               random_state=random_state,
+               criterion="squared_error",
+               n_estimators=100)
 
     c_gb.fit(x_train, y_train)
     pred_cgb = c_gb.predict(x_test)
@@ -40,7 +41,7 @@ def reg(X, y, max_depth, random_state):
                                      max_features="sqrt",
                                      learning_rate=0.1,
                                      random_state=random_state,
-                                     criterion="mse",
+                                     criterion="squared_error",
                                      n_estimators=100)
     for i in range(y.shape[1]):
         mart.fit(x_train, y_train[:, i])
