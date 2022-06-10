@@ -1,5 +1,6 @@
 import numpy as np
 import tracemalloc
+from cgb import cgb_clf
 from gbdtmo import load_lib
 import sklearn.datasets as dts
 from time import process_time
@@ -7,7 +8,6 @@ import matplotlib.pyplot as plt
 from TFBT import BoostedTreesClassifier
 from IPython.display import clear_output
 from wrapper import regression, classification
-from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
@@ -49,16 +49,16 @@ for i in range(1, T+1):
 
     tracemalloc.start()
     tracemalloc.clear_traces()
-    cgb = C_GradientBoostingClassifier(max_depth=5,
-                                       subsample=1,
-                                       max_features='sqrt',
-                                       learning_rate=0.1,
-                                       random_state=1,
-                                       criterion="mse",
-                                       loss="deviance",
-                                       n_estimators=i)
+    cgb_ = cgb_clf(max_depth=max_depth,
+                    subsample=1,
+                    max_features="sqrt",
+                    learning_rate=0.1,
+                    random_state=1,
+                    n_estimators=i,
+                    criterion='squared_error')
+    
     t0 = process_time()
-    cgb.fit(x_train, y_train)
+    cgb_.fit(x_train, y_train)
     MemCGB[i-1] = (tracemalloc.get_traced_memory()[0])
     time_cgb[i-1] = process_time()-t0
 
