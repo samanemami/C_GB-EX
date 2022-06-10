@@ -45,6 +45,9 @@ def c_gb(tree_id=0, max_depth=5, random_state=1):
 
     plot(tree, axs=axs)
     plt.tight_layout()
+    
+    plt.savefig('CGB_Tree.jpg',  dpi=700)
+    plt.savefig('CGB_Tree.eps')
 
 
 def mart(max_depth=5, random_state=1):
