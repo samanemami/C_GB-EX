@@ -1,9 +1,9 @@
 import warnings
 import numpy as np
+from cgb import cgb_clf
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
 def model_training(X, y, max_depth, T, random_state):
@@ -45,14 +45,14 @@ def model_training(X, y, max_depth, T, random_state):
     mart.fit(x_train, y_train)
 
     #  Training the proposed condensed method
-    c_gb = C_GradientBoostingClassifier(max_depth=max_depth,
-                                        subsample=0.75,
-                                        max_features="sqrt",
-                                        learning_rate=0.1,
-                                        random_state=random_state,
-                                        criterion="mse",
-                                        n_estimators=T
-                                        )
+   c_gb = cgb_clf(max_depth=max_depth,
+                  subsample=0.75,
+                  max_features="sqrt",
+                  learning_rate=0.1,
+                  random_state=random_state,
+                  n_estimators=T,
+                  criterion='squared_error')
+    
     c_gb.fit(x_train, y_train)
 
     precision_c_gb = np.zeros((T, n_class))
