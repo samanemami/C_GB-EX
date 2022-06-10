@@ -1,7 +1,7 @@
 import numpy as np
+from cgb import cgb_clf
 import sklearn.datasets as dt
 from gbdtmo import GBDTMulti, load_lib
-from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
@@ -21,19 +21,18 @@ x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=random_state)
 
 
-cgb = C_GradientBoostingClassifier(max_depth=max_depth,
-                                   subsample=1,
-                                   max_features="sqrt",
-                                   learning_rate=0.1,
-                                   random_state=random_state,
-                                   criterion="mse",
-                                   loss="deviance",
-                                   n_estimators=n_estimator)
+cgb_ = cgb_clf(max_depth=max_depth,
+               subsample=1,
+               max_features="sqrt",
+               learning_rate=0.1,
+               random_state=random_state,
+               n_estimators=n_estimator,
+               criterion='squared_error')
 
 
-cgb.fit(x_train, y_train)
+cgb_.fit(x_train, y_train)
 print('C-GB Leaves')
-print(sum(tree.tree_.n_leaves for tree in cgb.estimators_.reshape(-1)))
+print(sum(tree.tree_.n_leaves for tree in cgb_.estimators_.reshape(-1)))
 
 
 mart = GradientBoostingClassifier(max_depth=max_depth,
