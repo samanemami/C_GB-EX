@@ -1,9 +1,9 @@
 import numpy as np
+from cgb import cgb_clf
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from wrapper import classification
 from sklearn.model_selection import train_test_split
-from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
 
@@ -40,15 +40,16 @@ plt.scatter(X[:, 0], X[:, 1], c=y)
 path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 tfbt_path = "Path_to_remove_tf_logs"
 
-c_gb = C_GradientBoostingClassifier(max_depth=20,
-                                    subsample=0.75,
-                                    max_features="sqrt",
-                                    learning_rate=0.1,
-                                    random_state=1,
-                                    criterion="mse",
-                                    n_estimators=100)
 
-c_gb.fit(X, y)
+cgb_ = cgb_clf(max_depth=20,
+               subsample=0.75,
+               max_features="sqrt",
+               learning_rate=0.1,
+               random_state=1,
+               n_estimators=100,
+               criterion='squared_error')
+
+cgb_.fit(X, y)
 
 
 mart = GradientBoostingClassifier(max_depth=20,
@@ -76,7 +77,7 @@ model_gbdtmo.fit(X, y)
 
 plt.figure(num=1, figsize=(20, 7))
 plt.subplot(1, 3, 1)
-plotModel_MultiClass(X, y, c_gb, title="C-GB")
+plotModel_MultiClass(X, y, cgb_, title="C-GB")
 
 plt.subplot(1, 3, 2)
 plotModel_MultiClass(X, y, mart, title="MART")
