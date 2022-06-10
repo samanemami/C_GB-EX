@@ -1,9 +1,9 @@
 import warnings
 import numpy as np
+from cgb import cgb_clf
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
-from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from gbdtmo import GBDTMulti, load_lib, create_graph
 from sklearn.ensemble import GradientBoostingClassifier
@@ -24,12 +24,14 @@ X, y = dts.make_classification(n_features=2,
 
 
 def cgb(tree_id=0, max_depth=3, random_state=1):
-    model = C_GradientBoostingClassifier(max_depth=max_depth,
-                                         subsample=0.75,
-                                         max_features="sqrt",
-                                         learning_rate=0.1,
-                                         random_state=random_state,
-                                         n_estimators=100)
+  
+    model = cgb_clf(max_depth=max_depth,
+                    subsample=0.75,
+                    max_features="sqrt",
+                    learning_rate=0.1,
+                    random_state=random_state,
+                    n_estimators=100,
+                    criterion='squared_error')
     model.fit(X, y)
     tree = model.estimators_.reshape(-1)[tree_id]
     print("number of leaves:", tree.tree_.n_leaves)
@@ -41,7 +43,8 @@ def cgb(tree_id=0, max_depth=3, random_state=1):
     plt.close("all")
 
 
-def mart(tree_id=0, max_depth=3, random_state=1):
+def mart(max_depth=3, random_state=1):
+  
     model = GradientBoostingClassifier(max_depth=max_depth,
                                        subsample=0.75,
                                        max_features="sqrt",
@@ -53,7 +56,7 @@ def mart(tree_id=0, max_depth=3, random_state=1):
     model.fit(X, y)
     # Plot decision tree regressor for each class
     for i in range(n_classes):
-        tree = model.estimators_.reshape(-1)[tree_id + i]
+        tree = model.estimators_[0][i]
 
         print("number of leaves_Tree1:", tree.tree_.n_leaves)
         plot_tree(tree)
@@ -62,6 +65,7 @@ def mart(tree_id=0, max_depth=3, random_state=1):
 
 
 def gbdtmo(tree_id=0, max_depth=3, random_state=1):
+  
     params = {"max_depth": max_depth, "lr": 0.1,
               'loss': b"ce", 'verbose': False, 'seed': random_state}
 
@@ -101,5 +105,5 @@ def gbdtmo(tree_id=0, max_depth=3, random_state=1):
 
 if __name__ == "__main__":
     cgb(tree_id=0, max_depth=2, random_state=1)
-    mart(tree_id=0, max_depth=2, random_state=1)
+    mart(max_depth=2, random_state=1)
     gbdtmo(tree_id=0, max_depth=2, random_state=1)
