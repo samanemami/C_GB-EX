@@ -1,9 +1,9 @@
 import warnings
 import numpy as np
+from cgb import cgb_clf
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from Scikit_CGB import C_GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 
 warnings.simplefilter('ignore')
@@ -22,13 +22,13 @@ def loss_curve(max_depth=2, n_classes=3):
                                    flip_y=0.15)
 
     #  Training the proposed condensed method
-    c_gb = C_GradientBoostingClassifier(max_depth=max_depth,
-                                        subsample=0.75,
-                                        max_features="sqrt",
-                                        learning_rate=0.1,
-                                        random_state=1,
-                                        criterion="mse",
-                                        n_estimators=100)
+    c_gb = cgb_clf(max_depth=max_depth,
+                  subsample=0.75,
+                  max_features="sqrt",
+                  learning_rate=0.1,
+                  random_state=random_state,
+                  n_estimators=T,
+                  criterion='100')
 
     c_gb.fit(X, y)
 
@@ -38,7 +38,7 @@ def loss_curve(max_depth=2, n_classes=3):
                                       max_features="sqrt",
                                       learning_rate=0.1,
                                       random_state=1,
-                                      criterion="mse",
+                                      criterion="squared_error",
                                       n_estimators=100)
     mart.fit(X, y)
 
