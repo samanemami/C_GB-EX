@@ -1,12 +1,12 @@
 import warnings
 import numpy as np
 import seaborn as sns
+from cgb import cgb_reg
 import scipy.stats as st
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
-from Scikit_CGB import C_GradientBoostingRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
 
@@ -27,13 +27,13 @@ pred_mart = np.zeros_like(y_test)
 max_depth = 2
 
 
-c_gb = C_GradientBoostingRegressor(max_depth=max_depth,
-                                   subsample=0.75,
-                                   max_features="sqrt",
-                                   learning_rate=0.1,
-                                   random_state=1,
-                                   criterion="mse",
-                                   n_estimators=100)
+c_gb = cgb_reg(max_depth=max_depth,
+               subsample=0.75,
+               max_features="sqrt",
+               learning_rate=0.1,
+               random_state=1,
+               criterion="squared_error",
+               n_estimators=100)
 
 c_gb.fit(x_train, y_train)
 pred_cgb = c_gb.predict(x_test)
