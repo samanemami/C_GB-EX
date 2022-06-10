@@ -22,9 +22,13 @@ X, y = dts.make_classification(n_features=2,
                                n_samples=200,
                                flip_y=0.15)
 
+def plot(tree, axs):
 
-def cgb(tree_id=0, max_depth=3, random_state=1):
-  
+    return plot_tree(tree, filled=True, rounded=True, precision=2, ax=axs)
+
+
+def c_gb(tree_id=0, max_depth=5, random_state=1):
+
     model = cgb_clf(max_depth=max_depth,
                     subsample=0.75,
                     max_features="sqrt",
@@ -35,33 +39,37 @@ def cgb(tree_id=0, max_depth=3, random_state=1):
     model.fit(X, y)
     tree = model.estimators_.reshape(-1)[tree_id]
     print("number of leaves:", tree.tree_.n_leaves)
-    # Storing class labels for further applications
-    class_names = []
-    [class_names.append(str(i)) for i in model.classes_]
-    plot_tree(tree)
-    plt.savefig('C_GB_Tree.jpg', dpi=500)
-    plt.close("all")
+
+    fig, axs = plt.subplots(1, 1, figsize=(7, 2), facecolor='w')
+    fig.subplots_adjust(hspace=0, wspace=0)
+
+    plot(tree, axs=axs)
+    plt.tight_layout()
 
 
-def mart(max_depth=3, random_state=1):
-  
+def mart(max_depth=5, random_state=1):
+
     model = GradientBoostingClassifier(max_depth=max_depth,
                                        subsample=0.75,
                                        max_features="sqrt",
                                        learning_rate=0.1,
                                        random_state=random_state,
-                                       criterion="mse",
+                                       criterion="squared_error",
                                        n_estimators=100)
 
     model.fit(X, y)
-    # Plot decision tree regressor for each class
-    for i in range(n_classes):
+    fig, axs = plt.subplots(1, 2, figsize=(9, 2), facecolor='w')
+    fig.subplots_adjust(hspace=0, wspace=0)
+    for i in range(n_classes-1):
         tree = model.estimators_[0][i]
-
         print("number of leaves_Tree1:", tree.tree_.n_leaves)
-        plot_tree(tree)
-        plt.savefig('MART_Tree' + str(i) + '.jpg', dpi=500)
-        plt.close("all")
+
+        plot(tree, axs[i])
+        axs[i].set_title('class '+str(i))
+
+    plt.tight_layout()
+    plt.savefig('MART_Tree.jpg',  dpi=700)
+    plt.savefig('MART_Tree.eps')
 
 
 def gbdtmo(tree_id=0, max_depth=3, random_state=1):
@@ -104,6 +112,6 @@ def gbdtmo(tree_id=0, max_depth=3, random_state=1):
 
 
 if __name__ == "__main__":
-    cgb(tree_id=0, max_depth=2, random_state=1)
+    c_gb(tree_id=0, max_depth=2, random_state=1)
     mart(max_depth=2, random_state=1)
     gbdtmo(tree_id=0, max_depth=2, random_state=1)
