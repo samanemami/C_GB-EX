@@ -41,7 +41,7 @@ path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
 tfbt_path = "Path_to_remove_tf_logs"
 
 
-cgb_ = cgb_clf(max_depth=20,
+cgb_ = cgb_clf(max_depth=5,
                subsample=0.75,
                max_features="sqrt",
                learning_rate=0.1,
@@ -52,7 +52,7 @@ cgb_ = cgb_clf(max_depth=20,
 cgb_.fit(X, y)
 
 
-mart = GradientBoostingClassifier(max_depth=20,
+mart = GradientBoostingClassifier(max_depth=5,
                                   subsample=0.75,
                                   max_features="sqrt",
                                   learning_rate=0.1,
@@ -63,7 +63,7 @@ mart = GradientBoostingClassifier(max_depth=20,
 mart.fit(X, y)
 
 
-model_gbdtmo = classification(max_depth=20,
+model_gbdtmo = classification(max_depth=5,
                               learning_rate=0.1,
                               random_state=1,
                               num_boosters=100,
