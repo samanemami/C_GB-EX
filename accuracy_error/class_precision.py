@@ -6,6 +6,10 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
+
+warnings.simplefilter('ignore')
+
+
 def model_training(X, y, max_depth, T, random_state):
     """ Training the C-GB and MART models.
 
@@ -39,20 +43,20 @@ def model_training(X, y, max_depth, T, random_state):
                                       max_features="sqrt",
                                       learning_rate=0.1,
                                       random_state=random_state,
-                                      criterion="mse",
+                                      criterion="squared_error",
                                       n_estimators=T
                                       )
     mart.fit(x_train, y_train)
 
     #  Training the proposed condensed method
-   c_gb = cgb_clf(max_depth=max_depth,
-                  subsample=0.75,
-                  max_features="sqrt",
-                  learning_rate=0.1,
-                  random_state=random_state,
-                  n_estimators=T,
-                  criterion='squared_error')
-    
+    c_gb = cgb_clf(max_depth=max_depth,
+                   subsample=0.75,
+                   max_features="sqrt",
+                   learning_rate=0.1,
+                   random_state=random_state,
+                   criterion="squared_error",
+                   n_estimators=T
+                   )
     c_gb.fit(x_train, y_train)
 
     precision_c_gb = np.zeros((T, n_class))
@@ -73,63 +77,59 @@ def model_training(X, y, max_depth, T, random_state):
 
     return precision_c_gb, precision_mart
 
-# jet = plt.get_cmap('bwr')
-# colors = iter(jet(np.linspace(0, 2, n_class+1)))
-# color =next(colors)
-
 
 if __name__ == '__main__':
-    warnings.simplefilter('ignore')
 
-    # Dataset Entry
-    vehicle = np.loadtxt(
-        'vehicle.data',
-        delimiter=',')
-    X = vehicle[:, :-1]
-    y = vehicle[:, -1]
+    # Dataset
+    waveform = np.loadtxt(waveform.data', delimiter=',')
+    X = waveform[:, :-1]
+    y = waveform[:, -1]
 
     # Number of class labels
     n_class = len(np.unique(y))
-
-    # Number of base learners
-    T = 100
-
     # define how much it trains the model
     n = 10
 
+    fig, axes = plt.subplots(2, n_class, figsize=(20, 7))
+    # fig.subplots_adjust(hspace=.4, wspace=.2)
+
+
     # Train the models for different values of the maximum depth
-    for _, j in enumerate([2, 5, 10, 20]):
+    for i, depth in enumerate([2, 5, 10, 20]):
         c_gb = np.zeros((100, n_class))
         mart = np.zeros((100, n_class))
 
-        for i in range(n):
+        for seed in range(n):
             precision_c_gb, precision_mart = model_training(X=X,
                                                             y=y,
-                                                            max_depth=j,
-                                                            T=T,
-                                                            random_state=i)
+                                                            max_depth=depth,
+                                                            T=100,
+                                                            random_state=seed)
             c_gb += precision_c_gb
             mart += precision_mart
+
         c_gb = c_gb/n
         mart = mart/n
 
-        fig, axes = plt.subplots(4, n_class, figsize=(15, 3))
-        plt.tight_layout()
+        for k in range(n_class):
 
-        for i in range(n_class):
-            plt.subplot(1, n_class, i+1)
-            plt.plot(mart[:, i],
-                     label='MART', color='r')
-            plt.plot(c_gb[:, i],
-                     label='C-GB', color='b')
-            plt.grid(True, alpha=0.7)
-            plt.xlabel('Boosting iteration')
-            plt.ylabel('class Precision')
-            plt.yticks(np.arange(0.0, 0.9, step=0.05))
-            plt.autoscale(enable=True, axis='both')
-            # plt.suptitle('Max depth=' + str(j))
-            plt.title('class ' + str(i))
-            plt.tight_layout()
-            plt.legend()
-        plt.savefig('precision' + str(j)+'.eps')
+            axes[i][k].plot(mart[:, k],
+                            label='GB', color='r')
+            axes[i][k].plot(c_gb[:, k],
+                            label='C-GB', color='b')
+
+            axes[i][k].grid(True, alpha=0.7)
+            axes[i][k].set_yticks(np.arange(0.7, 0.9, step=0.05))
+            axes[i][k].set_xlabel('Boosting iteration')
+            axes[i][k].set_title('class ' + str(k))
+            axes[i][k].text(0.95, 0.01, 'Max Depth='+str(depth),
+                            verticalalignment='bottom',
+                            horizontalalignment='right',
+                            transform=axes[i][k].transAxes,
+                            color='green', fontsize=15)
+        axes[i][0].set_ylabel('precision')
         print('*', end='')
+
+plt.legend(loc='upper center', bbox_to_anchor=(-0.92, -0.2),
+           fancybox=False, shadow=False, ncol=2)
+plt.savefig('precision.jpg', dpi=700)
