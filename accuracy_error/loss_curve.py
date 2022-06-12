@@ -43,8 +43,9 @@ def loss_curve(max_depth=2):
 
     # Plotting the training loss curve
     plt.plot(mart.train_score_, color='r',
-             alpha=1, label='MART', linestyle='--')
-    plt.plot(c_gb.train_score_, color='b', alpha=0.4, label='C-GB')
+             alpha=1, label='GB', linestyle='-')
+    plt.plot(c_gb.train_score_, color='b', linestyle='--',
+             alpha=0.4, label='C-GB')
     plt.title('Max depth=' + str(max_depth))
     plt.xlabel('Boosting iteration')
     plt.ylabel('Training error')
@@ -57,7 +58,10 @@ if __name__ == '__main__':
     for i, j in enumerate([2, 5, 10, 20]):
         plt.subplot(2, 2, i+1)
         loss_curve(max_depth=j)
+        print('*', end='')
+
     plt.legend(loc='upper center', bbox_to_anchor=(-.15, -0.13),
                fancybox=False, shadow=False, ncol=2)
     plt.subplots_adjust(hspace=0.6, wspace=0.2)
-    plt.savefig('loss_curve.jpg', dpi=1000)
+    plt.rasterized(True)
+    plt.savefig('loss_curve.jpg', dpi=700)
