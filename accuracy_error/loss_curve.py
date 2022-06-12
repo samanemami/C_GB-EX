@@ -62,3 +62,4 @@ if __name__ == '__main__':
                fancybox=False, shadow=False, ncol=2)
     plt.subplots_adjust(hspace=0.6, wspace=0.2)
     plt.savefig('loss_curve.jpg', dpi=700)
+    plt.savefig('loss_curve.eps',rasterized=True,dpi=700)
