@@ -1,12 +1,12 @@
-from sklearn.ensemble import GradientBoostingRegressor
-from cgb import cgb_reg
-import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
 import warnings
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.model_selection import train_test_split
+import seaborn as sns
+from cgb import cgb_reg
+from sklearn.ensemble import GradientBoostingRegressor
 
 
 
@@ -21,8 +21,7 @@ def data():
         'overall_height', 'orientation', 'glazing_area',
         'glazing_area_distribution', 'heating_load', 'cooling_load'
     ]
-    data = pd.read_csv('energy.data',
-        names=cl)
+    data = pd.read_csv('energy.data', names=cl)
     X = data.drop(['heating_load', 'cooling_load'], axis=1).values
     y = (data[['heating_load', 'cooling_load']]).values
     return X, y
@@ -111,6 +110,11 @@ def hexbin(x, y, xlabel, ylabel, title):
     plt.tight_layout()
 
 
+def rmse(y, pred, target):
+    error = mean_squared_error(y[:, target], pred[:, target], squared=False)
+    return "RMSE: " + str("{:.2f}".format(error))
+
+
 if __name__ == '__main__':
 
     n = 10
@@ -134,7 +138,6 @@ if __name__ == '__main__':
     pred_gb = gb / n
     y = y/n
 
-
     # Plot the Scatter, and histograms
     scatter(y, pred_cgb, pred_gb, axs1[0][0])
     axs1[0][0].set_title('Data point distribution')
@@ -148,22 +151,28 @@ if __name__ == '__main__':
     sns.distplot(a=euclidean_gb, hist=True, kde=True, rug=False,
                  label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[0][1])
     sns.distplot(a=euclidean_cgb, hist=True, kde=True,
-                 rug=False, label='C-GB', color='b', hist_kws={"alpha": 0.7}, ax=axs1[0][1])
+                 rug=False, label='C-GB', color='b',
+                 hist_kws={"histtype": "step", "linewidth": 3,
+                           "alpha": 0.7}, ax=axs1[0][1])
 
     axs1[0][1].set_xlabel("Euclidean Distance")
     axs1[0][1].set_title("Histogram of the euclidean distance")
     axs1[0][1].legend()
     axs1[0][1].grid(True)
 
+
     sns.distplot(a=np.max(dist_gb, axis=0), hist=True, kde=True,
                  rug=False, label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[1][0])
     sns.distplot(a=np.max(dist_cgb, axis=0), hist=True, kde=True,
-                 rug=False, label='C-GB', color='b', hist_kws={"alpha": 0.7}, ax=axs1[1][0])
+                 rug=False, label='C-GB', color='b',
+                 hist_kws={"histtype": "step", "linewidth": 3,
+                           "alpha": 0.7}, ax=axs1[1][0])
 
     sns.distplot(a=np.min(dist_gb, axis=0), hist=True, kde=True,
                  rug=False, label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[1][1])
     sns.distplot(a=np.min(dist_cgb, axis=0), kde=True, hist=True,
-                 rug=False, label='C-GB', color='b', hist_kws={"alpha": 0.7}, ax=axs1[1][1])
+                 rug=False, label='C-GB', color='b', hist_kws={"histtype": "step", "linewidth": 3,
+                                                               "alpha": 0.7}, ax=axs1[1][1])
 
     axs1[1][0].set_xlabel("Distance")
     axs1[1][0].set_title("Maximum Distance")
@@ -177,11 +186,8 @@ if __name__ == '__main__':
 
     fig1.suptitle("Comparing C-GB and GB")
     fig1.tight_layout()
-    fig1.savefig('hist.png', dpi=1000)
+    fig1.savefig('regression_plt.eps')
     plt.close('all')
-
-
-
 
     # Plot the hexbin
     fig2, axs2 = plt.subplots(2, 2, figsize=size)
@@ -192,7 +198,8 @@ if __name__ == '__main__':
         plt.cla()
 
         axs2[target, 0].hexbin(y[:, target], pred_cgb[:, target], gridsize=15,
-                               mincnt=1, edgecolors="none", cmap="viridis", label=lb)
+                               mincnt=1, edgecolors="none", cmap="viridis",
+                               label=rmse(y, pred_cgb, target))
         axs2[target, 0].scatter(
             y_test[:, target], pred_cgb[:, target], s=2, c="white")
         axs2[target, 0].set_xlabel('real values')
@@ -202,11 +209,13 @@ if __name__ == '__main__':
                              transform=axs2[target, 0].transAxes,
                              color='k',
                              )
+        axs2[target, 0].legend(loc=2)
 
         plt.cla()
 
         axs2[target, 1].hexbin(y_test[:, target], pred_gb[:, target], gridsize=15,
-                               mincnt=1, edgecolors="none", cmap="viridis", label=lb)
+                               mincnt=1, edgecolors="none", cmap="viridis",
+                               label=rmse(y, pred_gb, target))
         axs2[target, 1].scatter(
             y_test[:, target], pred_gb[:, target], s=2, c="white")
         axs2[target, 1].set_xlabel('real values')
@@ -216,6 +225,7 @@ if __name__ == '__main__':
                              transform=axs2[target, 1].transAxes,
                              color='k',
                              )
+        axs2[target, 1].legend(loc=2)
 
     axs2[0, 0].set_ylabel('predicted values')
     axs2[1, 0].set_ylabel('predicted values')
@@ -226,6 +236,5 @@ if __name__ == '__main__':
     axs2[0, 0].set_title('C-GB')
     axs2[0, 1].set_title('GB')
 
-    fig1.suptitle('The relationship between predicted and real data points')
-
-    fig2.savefig('Hexbin_Energy.jpg', dpi=1000)
+    fig2.suptitle('The relationship between predicted and real data points')
+    fig2.savefig('Hexbin.eps')
