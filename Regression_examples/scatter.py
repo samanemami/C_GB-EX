@@ -1,93 +1,107 @@
-import warnings
-import numpy as np
+# %%
+from sklearn.ensemble import GradientBoostingRegressor
 from cgb import cgb_reg
-import sklearn.datasets as dts
-import matplotlib.pyplot as plt
-from sklearn.metrics import r2_score
+import seaborn as sns
 from sklearn.model_selection import train_test_split
-from Scikit_CGB import C_GradientBoostingRegressor
-
+from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import warnings
+import sys
+sys.path.append(r'D:\Academic\Ph.D\Programming\Py\PhD Thesis\CGB\C-GB')
 
 
 warnings.simplefilter('ignore')
 random_state = 123
 np.random.seed(random_state)
 
-X, y = dts.make_regression(n_samples=1500,
-                           n_targets=2,
-                           random_state=random_state)
+
+def data():
+    cl = [
+        'relative_compactness', 'surface_area', 'wall_area', 'roof_area',
+        'overall_height', 'orientation', 'glazing_area',
+        'glazing_area_distribution', 'heating_load', 'cooling_load'
+    ]
+    data = pd.read_csv('energy.data',
+        names=cl)
+    X = data.drop(['heating_load', 'cooling_load'], axis=1).values
+    y = (data[['heating_load', 'cooling_load']]).values
+    return X, y
 
 
-def reg(X, y, max_depth, random_state):
+def model(max_depth, random_state):
+
+    X, y = data()
 
     x_train, x_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=random_state)
 
-    pred_mart = np.zeros_like(y_test)
-
     c_gb = cgb_reg(max_depth=max_depth,
-               subsample=0.75,
-               max_features="sqrt",
-               learning_rate=0.1,
-               random_state=random_state,
-               criterion="squared_error",
-               n_estimators=100)
+                   subsample=0.75,
+                   max_features="sqrt",
+                   learning_rate=0.2,
+                   random_state=random_state,
+                   criterion="squared_error",
+                   n_estimators=100)
 
     c_gb.fit(x_train, y_train)
     pred_cgb = c_gb.predict(x_test)
 
-    mart = GradientBoostingRegressor(max_depth=max_depth,
-                                     subsample=0.75,
-                                     max_features="sqrt",
-                                     learning_rate=0.1,
-                                     random_state=random_state,
-                                     criterion="squared_error",
-                                     n_estimators=100)
-    for i in range(y.shape[1]):
-        mart.fit(x_train, y_train[:, i])
-        pred_mart[:, i] = mart.predict(x_test)
+    gb = GradientBoostingRegressor(max_depth=max_depth,
+                                   subsample=0.75,
+                                   max_features="sqrt",
+                                   learning_rate=0.2,
+                                   random_state=random_state,
+                                   criterion="squared_error",
+                                   n_estimators=100)
+    pred_gb = np.zeros_like(y_test)
+    for i in range(y_train.shape[1]):
+        gb.fit(x_train, y_train[:, i])
+        pred_gb[:, i] = gb.predict(x_test)
 
-    return pred_cgb, pred_mart, y_test
+    return pred_cgb, pred_gb, y_test
 
 
-def scatter(y, pred_cgb, pred_mart):
+def scatter(y, pred_cgb, pred_gb, axs):
 
-    plt.scatter(
+    axs.scatter(
         y[:, 0],
         y[:, 1],
         edgecolor="k",
         c="navy",
-        s=5,
+        s=20,
         marker="s",
         alpha=0.3,
         label="Real values",
     )
 
-    plt.scatter(
+    axs.scatter(
         pred_cgb[:, 0],
         pred_cgb[:, 1],
-        edgecolor="k",
-        c="cornflowerblue",
-        s=5,
+        # edgecolor="k",
+        c="firebrick",
+        s=20,
         alpha=0.3,
-        label='C-GB=%.2f' % r2_score(y, pred_cgb)
+        label='C-GB=%.3f' % r2_score(y, pred_cgb)
     )
 
-    plt.scatter(
-        pred_mart[:, 0],
-        pred_mart[:, 1],
-        edgecolor="k",
-        c="c",
-        s=5,
+    axs.scatter(
+        pred_gb[:, 0],
+        pred_gb[:, 1],
+        # edgecolor="k",
+        c="g",
+        s=20,
         marker="^",
         alpha=0.3,
-        label='MART=%.2f' % r2_score(y, pred_mart),
+        label='GB=%.3f' % r2_score(y, pred_gb),
     )
 
-    plt.xlabel("target 1")
-    plt.ylabel("target 2")
+    axs.set_xlabel("Heating")
+    axs.set_ylabel("Cooling")
+    axs.grid(True)
     # plt.xscale("log")
-    plt.legend()
+    axs.legend()
 
 
 def hexbin(x, y, xlabel, ylabel, title):
@@ -102,78 +116,118 @@ def hexbin(x, y, xlabel, ylabel, title):
 if __name__ == '__main__':
 
     n = 10
-    depth = [2, 5, 10, 20]
-    plt.figure(figsize=(10, 7))
-    for _, j in enumerate(depth):
-        y_test = reg(X=X,
-                     y=y,
-                     max_depth=j,
-                     random_state=_)[2]
+    size = (10, 7)
 
-        cgb = np.zeros_like(y_test)
-        mart = np.zeros_like(y_test)
-        Y = np.zeros_like(y_test)
-        for i in range(n):
-            pred_cgb, pred_mart, y_test = reg(X=X,
-                                              y=y,
-                                              max_depth=j,
-                                              random_state=i)
-            cgb += pred_cgb
-            mart += pred_mart
-            Y += y_test
+    y_test = model(max_depth=5, random_state=1)[2]
 
-        pred_cgb = cgb / n
-        pred_mart = mart / n
-        Y = Y/n
+    cgb = np.zeros_like(y_test)
+    gb = np.zeros_like(y_test)
+    y = np.zeros_like(y_test)
 
-        np.savetxt('pred_cgb' + str(j) + '.csv', pred_cgb, delimiter=',')
-        np.savetxt('pred_mart' + str(j) + '.csv', pred_mart, delimiter=',')
-        np.savetxt('y_test' + str(j) + '.csv', Y, delimiter=',')
+    fig1, axs1 = plt.subplots(2, 2, figsize=size)
+    for i in range(n):
+        pred_cgb, pred_gb, y_test = model(max_depth=5,
+                                          random_state=1)
+        cgb += pred_cgb
+        gb += pred_gb
+        y += y_test
 
-        plt.subplot(2, 2, _+1)
-        scatter(Y, pred_cgb, pred_mart)
-        plt.suptitle('Comparing C-GB and MART Regressors')
-        plt.title('Max depth=' + str(j))
+    pred_cgb = cgb / n
+    pred_gb = gb / n
+    y = y/n
 
-    plt.subplots_adjust(hspace=0.3, wspace=.3)
-    plt.savefig('Scatter_regression.jpg', dpi=700)
+
+    # Plot the Scatter, and histograms
+    scatter(y, pred_cgb, pred_gb, axs1[0][0])
+    axs1[0][0].set_title('Data point distribution')
+
+    euclidean_gb = np.sqrt(np.power(y - pred_gb, 2).sum(axis=1))
+    euclidean_cgb = np.sqrt(np.power(y - pred_cgb, 2).sum(axis=1))
+
+    dist_cgb = np.sqrt(np.power(y - pred_cgb, 2))
+    dist_gb = np.sqrt(np.power(y - pred_gb, 2))
+
+    sns.distplot(a=euclidean_gb, hist=True, kde=True, rug=False,
+                 label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[0][1])
+    sns.distplot(a=euclidean_cgb, hist=True, kde=True,
+                 rug=False, label='C-GB', color='b', hist_kws={"alpha": 0.7}, ax=axs1[0][1])
+
+    axs1[0][1].set_xlabel("Euclidean Distance")
+    axs1[0][1].set_title("Histogram of the euclidean distance")
+    axs1[0][1].legend()
+    axs1[0][1].grid(True)
+
+    sns.distplot(a=np.max(dist_gb, axis=0), hist=True, kde=True,
+                 rug=False, label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[1][0])
+    sns.distplot(a=np.max(dist_cgb, axis=0), hist=True, kde=True,
+                 rug=False, label='C-GB', color='b', hist_kws={"alpha": 0.7}, ax=axs1[1][0])
+
+    sns.distplot(a=np.min(dist_gb, axis=0), hist=True, kde=True,
+                 rug=False, label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[1][1])
+    sns.distplot(a=np.min(dist_cgb, axis=0), kde=True, hist=True,
+                 rug=False, label='C-GB', color='b', hist_kws={"alpha": 0.7}, ax=axs1[1][1])
+
+    axs1[1][0].set_xlabel("Distance")
+    axs1[1][0].set_title("Maximum Distance")
+    axs1[1][0].legend()
+    axs1[1][0].grid(True)
+
+    axs1[1][1].set_xlabel("Distance")
+    axs1[1][1].set_title("Minimum Distance")
+    axs1[1][1].legend()
+    axs1[1][1].grid(True)
+
+    fig1.suptitle("Comparing C-GB and GB")
+    fig1.tight_layout()
+    fig1.savefig('hist.png', dpi=1000)
     plt.close('all')
 
-    fig1, axs1 = plt.subplots(4, 2, figsize=(10, 15))
-    fig2, axs2 = plt.subplots(4, 2, figsize=(10, 15))
-    for i, j in enumerate(depth):
-        pred_cgb = np.loadtxt('pred_cgb'+str(j) +
-                              '.csv', delimiter=',')
-        pred_mart = np.loadtxt('pred_mart'+str(j) +
-                               '.csv', delimiter=',')
-        y_test = np.loadtxt('y_test'+str(j) +
-                            '.csv', delimiter=',')
 
-        for _ in range(y_test.shape[1]):
-            plt.cla()
 
-            axs1[i, _].hexbin(y_test[:, _], pred_cgb[:, _], gridsize=15,
-                              mincnt=1, edgecolors="none", cmap="inferno")
-            axs1[i, _].scatter(y_test[:, _], pred_cgb[:, _], s=2, c="white")
-            axs1[i, _].set_xlabel('real values')
-            axs1[i, _].set_ylabel('predicted values')
-            axs1[i, _].set_title('\n' + 'Max depth=' +
-                                 str(j) + '\n' +
-                                 'target=' + str(_))
-            plt.cla()
 
-            axs2[i, _].hexbin(y_test[:, _], pred_mart[:, _], gridsize=15,
-                              mincnt=1, edgecolors="none", cmap="inferno")
-            axs2[i, _].scatter(y_test[:, _], pred_mart[:, _], s=2, c="white")
-            axs2[i, _].set_xlabel('real values')
-            axs2[i, _].set_ylabel('predicted values')
-            axs2[i, _].set_title('\n' + 'Max depth=' +
-                                 str(j) + '\n' +
-                                 'target=' + str(_))
-            fig2.tight_layout()
-            fig1.tight_layout()
+    # Plot the hexbin
+    fig2, axs2 = plt.subplots(2, 2, figsize=size)
+    fig2.subplots_adjust(hspace=0, wspace=0)
 
-    fig1.suptitle('C-GB')
-    fig2.suptitle('MART')
-    fig1.savefig('hexbin_cgb.jpg', dpi=500)
-    fig2.savefig('hexbin_mart.jpg', dpi=500)
+    labels = ["Heating", "Cooling"]
+    for target, lb in enumerate(labels):
+        plt.cla()
+
+        axs2[target, 0].hexbin(y[:, target], pred_cgb[:, target], gridsize=15,
+                               mincnt=1, edgecolors="none", cmap="YlGn", label=lb)
+        axs2[target, 0].scatter(
+            y_test[:, target], pred_cgb[:, target], s=2, c="white")
+        axs2[target, 0].set_xlabel('real values')
+        axs2[target, 0].text(0.95, 0.1, 'target: ' + lb,
+                             verticalalignment='bottom',
+                             horizontalalignment='right',
+                             transform=axs2[target, 0].transAxes,
+                             color='k',
+                             )
+
+        plt.cla()
+
+        axs2[target, 1].hexbin(y_test[:, target], pred_gb[:, target], gridsize=15,
+                               mincnt=1, edgecolors="none", cmap="YlGn", label=lb)
+        axs2[target, 1].scatter(
+            y_test[:, target], pred_gb[:, target], s=2, c="white")
+        axs2[target, 1].set_xlabel('real values')
+        axs2[target, 1].text(0.95, 0.1, 'target: ' + lb,
+                             verticalalignment='bottom',
+                             horizontalalignment='right',
+                             transform=axs2[target, 1].transAxes,
+                             color='k',
+                             )
+
+    axs2[0, 0].set_ylabel('predicted values')
+    axs2[1, 0].set_ylabel('predicted values')
+
+    axs2[0, 1].set_yticks([])
+    axs2[1, 1].set_yticks([])
+
+    axs2[0, 0].set_title('C-GB')
+    axs2[0, 1].set_title('GB')
+
+    fig1.suptitle('The relationship between predicted and real data points')
+
+    fig2.savefig('Hexbin_Energy.jpg', dpi=1000)
