@@ -192,7 +192,7 @@ if __name__ == '__main__':
         plt.cla()
 
         axs2[target, 0].hexbin(y[:, target], pred_cgb[:, target], gridsize=15,
-                               mincnt=1, edgecolors="none", cmap="YlGn", label=lb)
+                               mincnt=1, edgecolors="none", cmap="viridis", label=lb)
         axs2[target, 0].scatter(
             y_test[:, target], pred_cgb[:, target], s=2, c="white")
         axs2[target, 0].set_xlabel('real values')
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         plt.cla()
 
         axs2[target, 1].hexbin(y_test[:, target], pred_gb[:, target], gridsize=15,
-                               mincnt=1, edgecolors="none", cmap="YlGn", label=lb)
+                               mincnt=1, edgecolors="none", cmap="viridis", label=lb)
         axs2[target, 1].scatter(
             y_test[:, target], pred_gb[:, target], s=2, c="white")
         axs2[target, 1].set_xlabel('real values')
