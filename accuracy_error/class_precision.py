@@ -1,10 +1,10 @@
-import warnings
-import numpy as np
-from cgb import cgb_clf
-import matplotlib.pyplot as plt
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
+from cgb import cgb_clf
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+import matplotlib.pyplot as plt
+import numpy as np
+import warnings
 
 
 warnings.simplefilter('ignore')
@@ -81,7 +81,9 @@ def model_training(X, y, max_depth, T, random_state):
 if __name__ == '__main__':
 
     # Dataset
-    waveform = np.loadtxt('waveform.data', delimiter=',')
+    waveform = np.loadtxt(
+        r'D:\Academic\Ph.D\Programming\Datasets\Classification\waveform.data',
+        delimiter=',')
     X = waveform[:, :-1]
     y = waveform[:, -1]
 
@@ -90,11 +92,11 @@ if __name__ == '__main__':
     # define how much it trains the model
     n = 10
 
-    fig, axes = plt.subplots(2, n_class, figsize=(20, 7))
-    # fig.subplots_adjust(hspace=.4, wspace=.2)
-
+    fig, axes = plt.subplots(4, n_class, figsize=(20, 15))
+    fig.subplots_adjust(hspace=.6, wspace=0)
 
     # Train the models for different values of the maximum depth
+    yticks = np.arange(0.7, 0.9, step=0.05)
     for i, depth in enumerate([2, 5, 10, 20]):
         c_gb = np.zeros((100, n_class))
         mart = np.zeros((100, n_class))
@@ -118,18 +120,24 @@ if __name__ == '__main__':
             axes[i][k].plot(c_gb[:, k],
                             label='C-GB', color='b')
 
-            axes[i][k].grid(True, alpha=0.7)
-            axes[i][k].set_yticks(np.arange(0.7, 0.9, step=0.05))
             axes[i][k].set_xlabel('Boosting iteration')
             axes[i][k].set_title('class ' + str(k))
-            axes[i][k].text(0.95, 0.01, 'Max Depth='+str(depth),
+            axes[i][k].text(0.95, 0.1, 'Max Depth='+str(depth),
                             verticalalignment='bottom',
                             horizontalalignment='right',
                             transform=axes[i][k].transAxes,
-                            color='green', fontsize=15)
-        axes[i][0].set_ylabel('precision')
+                            color='k',
+                            # fontsize=10
+                            )
+            axes[i][k].set_yticks(yticks, labels=[" " for _ in yticks])
+            axes[i][k].grid(visible=True, axis='both')
+
+        axes[i][0].set_yticks(
+            yticks, labels=["{:.2f}".format(tick) for tick in yticks])
+        axes[i][0].set_ylabel('Precision')
+
         print('*', end='')
 
-plt.legend(loc='upper center', bbox_to_anchor=(-0.92, -0.2),
+plt.legend(loc='upper center', bbox_to_anchor=(-0.5, -0.27),
            fancybox=False, shadow=False, ncol=2)
-plt.savefig('precision.jpg', dpi=700)
+plt.savefig('precision.jpg')
