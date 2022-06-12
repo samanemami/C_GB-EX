@@ -33,7 +33,7 @@ For some of the experiments, it would be easier to use related wrappers. For thi
 * [C-GB](https://github.com/samanemami/C-GB)
 * [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
 * [GradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
-* [GBDTM-O](https://arxiv.org/abs/1909.04373)
+* [GBDT-MO](https://arxiv.org/abs/1909.04373)
 * [TFBT](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesClassifier)
 
 # The included examples
