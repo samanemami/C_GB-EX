@@ -6,9 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import warnings
 
-
 warnings.simplefilter('ignore')
-
 
 def loss_curve(max_depth=2):
 
@@ -63,5 +61,4 @@ if __name__ == '__main__':
     plt.legend(loc='upper center', bbox_to_anchor=(-.15, -0.13),
                fancybox=False, shadow=False, ncol=2)
     plt.subplots_adjust(hspace=0.6, wspace=0.2)
-    plt.rasterized(True)
     plt.savefig('loss_curve.jpg', dpi=700)
