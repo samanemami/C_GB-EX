@@ -1,4 +1,3 @@
-# %%
 from sklearn.ensemble import GradientBoostingRegressor
 from cgb import cgb_reg
 import seaborn as sns
@@ -8,8 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import warnings
-import sys
-sys.path.append(r'D:\Academic\Ph.D\Programming\Py\PhD Thesis\CGB\C-GB')
+
 
 
 warnings.simplefilter('ignore')
