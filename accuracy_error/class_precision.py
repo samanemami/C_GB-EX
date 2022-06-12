@@ -81,7 +81,7 @@ def model_training(X, y, max_depth, T, random_state):
 if __name__ == '__main__':
 
     # Dataset
-    waveform = np.loadtxt(waveform.data', delimiter=',')
+    waveform = np.loadtxt('waveform.data', delimiter=',')
     X = waveform[:, :-1]
     y = waveform[:, -1]
 
