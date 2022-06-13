@@ -1,12 +1,12 @@
-import warnings
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.metrics import r2_score, mean_squared_error
-from sklearn.model_selection import train_test_split
-import seaborn as sns
-from cgb import cgb_reg
 from sklearn.ensemble import GradientBoostingRegressor
+from cgb import cgb_reg
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import warnings
 
 
 
@@ -65,8 +65,8 @@ def scatter(y, pred_cgb, pred_gb, axs):
     axs.scatter(
         y[:, 0],
         y[:, 1],
-        edgecolor="k",
-        c="navy",
+        # edgecolor="k",
+        c="g",
         s=20,
         marker="s",
         alpha=0.3,
@@ -77,7 +77,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         pred_cgb[:, 0],
         pred_cgb[:, 1],
         # edgecolor="k",
-        c="firebrick",
+        c="royalblue",
         s=20,
         alpha=0.3,
         label='C-GB=%.3f' % r2_score(y, pred_cgb)
@@ -87,7 +87,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         pred_gb[:, 0],
         pred_gb[:, 1],
         # edgecolor="k",
-        c="g",
+        c="salmon",
         s=20,
         marker="^",
         alpha=0.3,
@@ -149,30 +149,39 @@ if __name__ == '__main__':
     dist_gb = np.sqrt(np.power(y - pred_gb, 2))
 
     sns.distplot(a=euclidean_gb, hist=True, kde=True, rug=False,
-                 label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[0][1])
+                 label='GB', color='salmon', hist_kws={"alpha": 0.6},
+                 kde_kws={"color": "r", "lw": 2, "label": "GB"},
+                 ax=axs1[0][1])
     sns.distplot(a=euclidean_cgb, hist=True, kde=True,
-                 rug=False, label='C-GB', color='b',
+                 rug=False, label='C-GB', color='royalblue',
                  hist_kws={"histtype": "step", "linewidth": 3,
-                           "alpha": 0.7}, ax=axs1[0][1])
+                           "alpha": 0.7},
+                 kde_kws={"color": "b", "lw": 2, "label": "C-GB"}, ax=axs1[0][1])
 
     axs1[0][1].set_xlabel("Euclidean Distance")
     axs1[0][1].set_title("Histogram of the euclidean distance")
     axs1[0][1].legend()
     axs1[0][1].grid(True)
 
-
+    # Maximum Distance
     sns.distplot(a=np.max(dist_gb, axis=0), hist=True, kde=True,
-                 rug=False, label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[1][0])
+                 rug=False, label='GB', color='salmon', hist_kws={"alpha": 0.6},
+                 kde_kws={"color": "r", "lw": 2, "label": "KGB"}, ax=axs1[1][0])
     sns.distplot(a=np.max(dist_cgb, axis=0), hist=True, kde=True,
-                 rug=False, label='C-GB', color='b',
+                 rug=False, label='C-GB', color='royalblue',
+                 kde_kws={"color": "b", "lw": 2, "label": "C-GB"},
                  hist_kws={"histtype": "step", "linewidth": 3,
                            "alpha": 0.7}, ax=axs1[1][0])
 
+    # Minimum Distance
     sns.distplot(a=np.min(dist_gb, axis=0), hist=True, kde=True,
-                 rug=False, label='GB', color='r', hist_kws={"alpha": 0.6}, ax=axs1[1][1])
-    sns.distplot(a=np.min(dist_cgb, axis=0), kde=True, hist=True,
-                 rug=False, label='C-GB', color='b', hist_kws={"histtype": "step", "linewidth": 3,
-                                                               "alpha": 0.7}, ax=axs1[1][1])
+                 rug=False, label='GB', color='salmon', hist_kws={"alpha": 0.6},
+                 kde_kws={"color": "r", "lw": 2, "label": "GB"}, ax=axs1[1][1])
+    sns.distplot(a=np.min(dist_cgb, axis=0), hist=True, kde=True,
+                 rug=False, label='C-GB', color='royalblue',
+                 kde_kws={"color": "b", "lw": 2, "label": "C-GB"},
+                 hist_kws={"histtype": "step", "linewidth": 3,
+                           "alpha": 0.7}, ax=axs1[1][1])
 
     axs1[1][0].set_xlabel("Distance")
     axs1[1][0].set_title("Maximum Distance")
