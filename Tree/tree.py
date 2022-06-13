@@ -1,16 +1,13 @@
 import warnings
 import numpy as np
-from cgb import cgb_clf
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
-from sklearn.model_selection import train_test_split
-from gbdtmo import GBDTMulti, load_lib, create_graph
+from cgb import cgb_clf
 from sklearn.ensemble import GradientBoostingClassifier
 
 warnings.simplefilter("ignore")
 np.random.seed(1)
-
 n_classes = 3
 
 X, y = dts.make_classification(n_features=2,
@@ -19,12 +16,47 @@ X, y = dts.make_classification(n_features=2,
                                random_state=2,
                                n_clusters_per_class=1,
                                n_classes=n_classes,
-                               n_samples=200,
+                               n_samples=100,
                                flip_y=0.15)
+
 
 def plot(tree, axs):
 
-    return plot_tree(tree, filled=True, rounded=True, precision=2, ax=axs)
+    plot_tree(tree, filled=True, rounded=True,
+              precision=2, ax=axs, label='root')
+
+
+def terminal_leaves(model, tree, class_):
+    # Return the terminal regions values
+    if model.estimators_.shape[1]>2:
+        est = model.estimators_[tree][class_]
+    else:
+        est = model.estimators_[tree][0]
+    children_left = est.tree_.children_left
+    children_right = est.tree_.children_right
+    n_nodes = est.tree_.node_count
+    is_leaves = np.zeros(shape=n_nodes, dtype=bool)
+
+    stack = [(0, 0)]  # start with the root node id (0) and its depth (0)
+    while len(stack) > 0:
+        # `pop` ensures each node is only visited once
+        node_id, depth = stack.pop()
+
+        # If the left and right child of a node is not the same we have a split
+        # node
+        is_split_node = children_left[node_id] != children_right[node_id]
+
+        if is_split_node:
+            stack.append((children_left[node_id], depth + 1))
+            stack.append((children_right[node_id], depth + 1))
+        else:
+            is_leaves[node_id] = True
+    terminal_leave = est.tree_.value[np.where(is_leaves == True)]
+    if model.estimators_.shape[1]>2: 
+        terminal_leave = terminal_leave.reshape(-1, 1)[:, 0]
+    else:
+        terminal_leave = terminal_leave[:, :, 0]
+    return terminal_leave
 
 
 def c_gb(tree_id=0, max_depth=5, random_state=1):
@@ -40,17 +72,24 @@ def c_gb(tree_id=0, max_depth=5, random_state=1):
     tree = model.estimators_.reshape(-1)[tree_id]
     print("number of leaves:", tree.tree_.n_leaves)
 
-    fig, axs = plt.subplots(1, 1, figsize=(7, 2), facecolor='w')
-    fig.subplots_adjust(hspace=0, wspace=0)
+    fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor='w')
+    fig2, axs2 = plt.subplots(1, 3, figsize=(10, 3), facecolor='w')
+    fig1.subplots_adjust(hspace=0, wspace=0)
 
-    plot(tree, axs=axs)
+    plot(tree, axs=axs1)
     plt.tight_layout()
-    
-    plt.savefig('CGB_Tree.jpg',  dpi=700)
-    plt.savefig('CGB_Tree.eps')
 
 
-def mart(max_depth=5, random_state=1):
+    terminal_leave = terminal_leaves(model, 0, 0)
+    for i in range(n_classes):
+        axs2[i].plot(terminal_leave[:, i])
+
+    fig2.savefig('leaves_CGB.jpg',  dpi=700)
+    fig1.savefig('C_GB_Tree.jpg',  dpi=700)
+    fig1.savefig('C_GB_Tree.eps')
+
+
+def GB(max_depth=5, random_state=1):
 
     model = GradientBoostingClassifier(max_depth=max_depth,
                                        subsample=0.75,
@@ -61,60 +100,38 @@ def mart(max_depth=5, random_state=1):
                                        n_estimators=100)
 
     model.fit(X, y)
-    fig, axs = plt.subplots(1, 2, figsize=(9, 2), facecolor='w')
-    fig.subplots_adjust(hspace=0, wspace=0)
+    fig1, axs1 = plt.subplots(1, 2, figsize=(30, 7), facecolor='w')
+    fig2, axs2 = plt.subplots(1, 3, figsize=(30, 7), facecolor='w')
+    fig1.subplots_adjust(hspace=0, wspace=0)
+    leaves = []
     for i in range(n_classes-1):
         tree = model.estimators_[0][i]
         print("number of leaves_Tree1:", tree.tree_.n_leaves)
 
-        plot(tree, axs[i])
-        axs[i].set_title('class '+str(i))
+        plot(tree, axs1[i])
+
+        # Find terminal region's values
+        #  (For the first tree and 3 classes)
+        axs2[i].plot(terminal_leaves(model, 0, i))
+
+    fig1.tight_layout()
+    fig1.savefig('GB_Tree.jpg',  dpi=700)
+    fig1.savefig('GB_Tree.eps')
+    plt.close('all')
+
+    tree = model.estimators_[0][2]
+    print("number of leaves_Tree1:", tree.tree_.n_leaves)
+
+    plot_tree(tree)
+
+    axs2[2].plot(terminal_leaves(model, 0, 2))
 
     plt.tight_layout()
-    plt.savefig('MART_Tree.jpg',  dpi=700)
-    plt.savefig('MART_Tree.eps')
+    plt.savefig('GB_Tree2.jpg',  dpi=700)
 
+    fig2.savefig('leaves,jpg')
 
-def gbdtmo(tree_id=0, max_depth=3, random_state=1):
-  
-    params = {"max_depth": max_depth, "lr": 0.1,
-              'loss': b"ce", 'verbose': False, 'seed': random_state}
+if __name__ == '__main__':
 
-    X, y = np.ascontiguousarray(
-        X, dtype=np.float64), y.astype(np.int32)
-
-    path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'  # Path to lib
-    lib = load_lib(path)
-
-    booster = GBDTMulti(lib, out_dim=len(np.unique(y)), params=params)
-    booster.set_data((X, y))
-    booster.train(100)
-
-    booster.dump(b"dumpmodel.txt")
-    graph = create_graph("dumpmodel.txt", tree_id, [
-                         0, len(np.unique(y))-1])
-    graph.render("GBDTMO_Tree", format='jpg')
-
-    nodes = []
-    dumped_model = "dumpmodel.txt"
-
-    with open(dumped_model, "r") as f:
-        tree = f.read().split("Booster")
-        tree.pop(0)
-        tree = tree[tree_id]
-        tree = tree.split("\n")[1:]
-        for line in tree:
-            line = line.strip().split(",")
-            if len(line) <= 1:
-                continue
-            node = int(line.pop(0))
-            if node > 0:
-                nodes.append(node)
-
-    print("number of leaves:", len(nodes))
-
-
-if __name__ == "__main__":
-    c_gb(tree_id=0, max_depth=2, random_state=1)
-    mart(max_depth=2, random_state=1)
-    gbdtmo(tree_id=0, max_depth=2, random_state=1)
+    c_gb()
+    GB()
