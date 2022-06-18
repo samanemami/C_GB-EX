@@ -6,6 +6,7 @@ from sklearn.tree import plot_tree
 from cgb import cgb_clf
 from sklearn.ensemble import GradientBoostingClassifier
 
+
 warnings.simplefilter("ignore")
 np.random.seed(1)
 n_classes = 3
@@ -23,12 +24,12 @@ X, y = dts.make_classification(n_features=2,
 def plot(tree, axs):
 
     plot_tree(tree, filled=True, rounded=True,
-              precision=2, ax=axs, label='root')
+              precision=2, ax=axs, label="root")
 
 
 def terminal_leaves(model, tree, class_):
     # Return the terminal regions values
-    if model.estimators_.shape[1]>2:
+    if model.estimators_.shape[1] > 2:
         est = model.estimators_[tree][class_]
     else:
         est = model.estimators_[tree][0]
@@ -52,7 +53,7 @@ def terminal_leaves(model, tree, class_):
         else:
             is_leaves[node_id] = True
     terminal_leave = est.tree_.value[np.where(is_leaves == True)]
-    if model.estimators_.shape[1]>2: 
+    if model.estimators_.shape[1] > 2:
         terminal_leave = terminal_leave.reshape(-1, 1)[:, 0]
     else:
         terminal_leave = terminal_leave[:, :, 0]
@@ -61,32 +62,43 @@ def terminal_leaves(model, tree, class_):
 
 def c_gb(tree_id=0, max_depth=5, random_state=1):
 
-    model = cgb_clf(max_depth=max_depth,
+    model = cgb_clf(max_depth=5,
                     subsample=0.75,
                     max_features="sqrt",
                     learning_rate=0.1,
                     random_state=random_state,
                     n_estimators=100,
-                    criterion='squared_error')
+                    criterion="squared_error")
     model.fit(X, y)
     tree = model.estimators_.reshape(-1)[tree_id]
     print("number of leaves:", tree.tree_.n_leaves)
 
-    fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor='w')
-    fig2, axs2 = plt.subplots(1, 3, figsize=(10, 3), facecolor='w')
-    fig1.subplots_adjust(hspace=0, wspace=0)
+    fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor="w")
+    fig2, axs2 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
 
     plot(tree, axs=axs1)
-    plt.tight_layout()
-
+    plt.close("all")
 
     terminal_leave = terminal_leaves(model, 0, 0)
     for i in range(n_classes):
         axs2[i].plot(terminal_leave[:, i])
+        axs2[i].set_title("class_" + str(i))
+        axs2[i].grid(True)
 
-    fig2.savefig('leaves_CGB.jpg',  dpi=700)
-    fig1.savefig('C_GB_Tree.jpg',  dpi=700)
-    fig1.savefig('C_GB_Tree.eps')
+    fig2.text(0.5, 1, 'Number of leaves='+str(tree.tree_.n_leaves),
+                            verticalalignment='top',
+                            horizontalalignment='center',
+                            # transform=axes[i][k].transAxes,
+                            color='k',
+                            # fontsize=10
+                            )
+
+    fig2.tight_layout()
+    fig1.tight_layout()
+
+    fig2.suptitle("Terminal leaves values - C-GB")
+    fig2.savefig("leaves_CGB.jpg",  dpi=700)
+    fig1.savefig("C_GB_Tree.eps")
 
 
 def GB(max_depth=5, random_state=1):
@@ -100,24 +112,26 @@ def GB(max_depth=5, random_state=1):
                                        n_estimators=100)
 
     model.fit(X, y)
-    fig1, axs1 = plt.subplots(1, 2, figsize=(30, 7), facecolor='w')
-    fig2, axs2 = plt.subplots(1, 3, figsize=(30, 7), facecolor='w')
+    fig1, axs1 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
+    fig2, axs2 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
     fig1.subplots_adjust(hspace=0, wspace=0)
-    leaves = []
+
     for i in range(n_classes-1):
         tree = model.estimators_[0][i]
-        print("number of leaves_Tree1:", tree.tree_.n_leaves)
+
 
         plot(tree, axs1[i])
 
-        # Find terminal region's values
+        # Find terminal region"s values
         #  (For the first tree and 3 classes)
         axs2[i].plot(terminal_leaves(model, 0, i))
+        axs2[i].set_title("class_" + str(i))
+        axs2[i].grid(True)
 
+    
     fig1.tight_layout()
-    fig1.savefig('GB_Tree.jpg',  dpi=700)
-    fig1.savefig('GB_Tree.eps')
-    plt.close('all')
+    fig1.savefig("GB_Tree.eps")
+    plt.close("all")
 
     tree = model.estimators_[0][2]
     print("number of leaves_Tree1:", tree.tree_.n_leaves)
@@ -125,13 +139,16 @@ def GB(max_depth=5, random_state=1):
     plot_tree(tree)
 
     axs2[2].plot(terminal_leaves(model, 0, 2))
+    axs2[2].grid(True)
+    axs2[2].set_title("class_2")
 
-    plt.tight_layout()
-    plt.savefig('GB_Tree2.jpg',  dpi=700)
+    fig2.suptitle("Terminal leaves values - GB")
+    fig2.tight_layout()
+    fig2.savefig("leaves_GB.jpg",  dpi=700)
+    plt.savefig("GB_Tree2.eps")
+    plt.close("all")
 
-    fig2.savefig('leaves,jpg')
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     c_gb()
     GB()
