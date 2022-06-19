@@ -1,9 +1,10 @@
 import warnings
 import numpy as np
+from cgb import cgb_clf
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
-from cgb import cgb_clf
+from scipy.interpolate import make_interp_spline
 from sklearn.ensemble import GradientBoostingClassifier
 
 
@@ -60,95 +61,98 @@ def terminal_leaves(model, tree, class_):
     return terminal_leave
 
 
-def c_gb(tree_id=0, max_depth=5, random_state=1):
+def interpolating(data):
+    y = [i for i in range(data.shape[0])]
+    idx = range(len(y))
+    x = np.linspace(min(idx), max(idx), 300)
 
-    model = cgb_clf(max_depth=5,
-                    subsample=0.75,
-                    max_features="sqrt",
-                    learning_rate=0.1,
-                    random_state=random_state,
-                    n_estimators=100,
-                    criterion="squared_error")
-    model.fit(X, y)
-    tree = model.estimators_.reshape(-1)[tree_id]
-    print("number of leaves:", tree.tree_.n_leaves)
+    spl = make_interp_spline(idx, data, k=2)
+    smooth = spl(x)
+
+    return x, smooth
+
+
+def model(random_state=1):
+
+    cgb = cgb_clf(max_depth=5,
+                  subsample=0.75,
+                  max_features="sqrt",
+                  learning_rate=0.1,
+                  random_state=random_state,
+                  n_estimators=100,
+                  criterion="squared_error")
+    cgb.fit(X, y)
+
+    gb = GradientBoostingClassifier(max_depth=5,
+                                    subsample=0.75,
+                                    max_features="sqrt",
+                                    learning_rate=0.1,
+                                    random_state=random_state,
+                                    criterion="squared_error",
+                                    n_estimators=100)
+
+    gb.fit(X, y)
+
+    tree_cgb = cgb.estimators_.reshape(-1)[0]
 
     fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor="w")
-    fig2, axs2 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
+    fig2, axs2 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
+    fig3, axs3 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
 
-    plot(tree, axs=axs1)
-    plt.close("all")
+    for i in range(1, 3):
+        exec(f'fig{i}.subplots_adjust(hspace=-0.5, wspace=-0.15)')
 
-    terminal_leave = terminal_leaves(model, 0, 0)
+    plot(tree_cgb, axs=axs1)
+
+    terminal_leave_CGB = terminal_leaves(cgb, 0, 0)
+
     for i in range(n_classes):
-        axs2[i].plot(terminal_leave[:, i])
-        axs2[i].set_title("class_" + str(i))
-        axs2[i].grid(True)
 
-    fig2.text(0.5, 1, 'Number of leaves='+str(tree.tree_.n_leaves),
-                            verticalalignment='top',
-                            horizontalalignment='center',
-                            # transform=axes[i][k].transAxes,
-                            color='k',
-                            # fontsize=10
-                            )
+        tree_gb = gb.estimators_[0][i]
+        j = i
+        if j < 2:
+            plot(tree_gb, axs2[j])
+        j += 1
 
-    fig2.tight_layout()
-    fig1.tight_layout()
+        new_x, smooth = interpolating(terminal_leave_CGB[:, i])
 
-    fig2.suptitle("Terminal leaves values - C-GB")
-    fig2.savefig("leaves_CGB.jpg",  dpi=700)
-    fig1.savefig("C_GB_Tree.eps")
+        axs3[i].plot(new_x, smooth, color='b',
+                     label="C-GB", linestyle="--", linewidth=3)
 
+        terminal_leave_GB = terminal_leaves(gb, 0, i)
 
-def GB(max_depth=5, random_state=1):
+        new_x, smooth = interpolating(terminal_leave_GB)
 
-    model = GradientBoostingClassifier(max_depth=max_depth,
-                                       subsample=0.75,
-                                       max_features="sqrt",
-                                       learning_rate=0.1,
-                                       random_state=random_state,
-                                       criterion="squared_error",
-                                       n_estimators=100)
+        axs3[i].plot(new_x, smooth, color='r',
+                     label="GB")
 
-    model.fit(X, y)
-    fig1, axs1 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
-    fig2, axs2 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
-    fig1.subplots_adjust(hspace=0, wspace=0)
+        axs3[i].set_title("class_" + str(i))
+        axs3[i].set_xlabel("Leave number")
+        axs3[i].grid(True)
 
-    for i in range(n_classes-1):
-        tree = model.estimators_[0][i]
+        axs3[i].text(0.02, 0.2, 'Number of leaves (GB)='+str(tree_gb.tree_.n_leaves),
+                     verticalalignment='bottom',
+                     horizontalalignment='left',
+                     transform=axs3[i].transAxes,
+                     color='r',
+                     fontsize=10,
+                     rotation=90
+                     )
 
+        axs3[i].text(.98, 0.2, 'Number of leaves (C-GB)='+str(tree_cgb.tree_.n_leaves),
+                     verticalalignment='bottom',
+                     horizontalalignment='center',
+                     transform=axs3[i].transAxes,
+                     color='b',
+                     fontsize=10,
+                     rotation=90
+                     )
 
-        plot(tree, axs1[i])
+    axs3[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axs3[0].set_ylabel("Leave value")
 
-        # Find terminal region"s values
-        #  (For the first tree and 3 classes)
-        axs2[i].plot(terminal_leaves(model, 0, i))
-        axs2[i].set_title("class_" + str(i))
-        axs2[i].grid(True)
-
-    
-    fig1.tight_layout()
-    fig1.savefig("GB_Tree.eps")
-    plt.close("all")
-
-    tree = model.estimators_[0][2]
-    print("number of leaves_Tree1:", tree.tree_.n_leaves)
-
-    plot_tree(tree)
-
-    axs2[2].plot(terminal_leaves(model, 0, 2))
-    axs2[2].grid(True)
-    axs2[2].set_title("class_2")
-
-    fig2.suptitle("Terminal leaves values - GB")
-    fig2.tight_layout()
-    fig2.savefig("leaves_GB.jpg",  dpi=700)
-    plt.savefig("GB_Tree2.eps")
-    plt.close("all")
-
+    fig3.suptitle("Terminal leaves values")
+    fig3.tight_layout()
 
 if __name__ == "__main__":
-    c_gb()
-    GB()
+    model()
