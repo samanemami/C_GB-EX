@@ -1,15 +1,16 @@
-import warnings
-import numpy as np
-from cgb import cgb_clf
-import sklearn.datasets as dts
-import matplotlib.pyplot as plt
-from sklearn.tree import plot_tree
-from scipy.interpolate import make_interp_spline
 from sklearn.ensemble import GradientBoostingClassifier
+from scipy.interpolate import make_interp_spline
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+import sklearn.datasets as dts
+from cgb import cgb_clf
+import numpy as np
+import warnings
 
 
 warnings.simplefilter("ignore")
 np.random.seed(1)
+
 n_classes = 3
 
 X, y = dts.make_classification(n_features=2,
@@ -61,12 +62,26 @@ def terminal_leaves(model, tree, class_):
     return terminal_leave
 
 
+def impurity(model, tree, class_):
+
+    # Return the impurity values
+    if model.estimators_.shape[1] > 2:
+        est = model.estimators_[tree][class_]
+    else:
+        est = model.estimators_[tree][0]
+    impurity = est.tree_.impurity
+
+    return impurity
+
+
 def interpolating(data):
+
+    # To smooth the plots
     y = [i for i in range(data.shape[0])]
     idx = range(len(y))
     x = np.linspace(min(idx), max(idx), 300)
 
-    spl = make_interp_spline(idx, data, k=2)
+    spl = make_interp_spline(idx, data, k=3)
     smooth = spl(x)
 
     return x, smooth
@@ -98,6 +113,7 @@ def model(random_state=1):
     fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor="w")
     fig2, axs2 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
     fig3, axs3 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
+    fig4, axs4 = plt.subplots(1, 3, figsize=(30, 7), facecolor="w")
 
     for i in range(1, 3):
         exec(f'fig{i}.subplots_adjust(hspace=-0.5, wspace=-0.15)')
@@ -114,16 +130,10 @@ def model(random_state=1):
             plot(tree_gb, axs2[j])
         j += 1
 
-        new_x, smooth = interpolating(terminal_leave_CGB[:, i])
-
-        axs3[i].plot(new_x, smooth, color='b',
+        axs3[i].plot(terminal_leave_CGB[:, i], color='b',
                      label="C-GB", linestyle="--", linewidth=3)
 
-        terminal_leave_GB = terminal_leaves(gb, 0, i)
-
-        new_x, smooth = interpolating(terminal_leave_GB)
-
-        axs3[i].plot(new_x, smooth, color='r',
+        axs3[i].plot(terminal_leaves(gb, 0, i), color='r',
                      label="GB")
 
         axs3[i].set_title("class_" + str(i))
@@ -148,11 +158,33 @@ def model(random_state=1):
                      rotation=90
                      )
 
+        axs4[i].plot(impurity(cgb, 0, 0), color='b',
+                     label="C-GB", linestyle="--", linewidth=3)
+
+        axs4[i].plot(impurity(gb, 0, i), color='r',
+                     label="GB")
+
+        axs4[i].set_title("all classes (GB) \n" + "class_" + str(i) + " (GB)")
+        axs4[i].set_xlabel("Tree nodes")
+        axs4[i].grid(True)
+
     axs3[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
     axs3[0].set_ylabel("Leave value")
 
-    fig3.suptitle("Terminal leaves values")
+    axs4[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    axs4[0].set_ylabel("MSE")
+
+    fig3.suptitle("Terminal leaves values of the first tree")
+    fig4.suptitle("Impurity value of the first tree")
+
+    fig4.tight_layout()
     fig3.tight_layout()
+
+    fig1.savefig("C_GB_Tree.jpg")
+    fig2.savefig("GB_Tree.jpg")
+    fig3.savefig("leaves_values.jpg")
+    fig4.savefig("impurity.jpg")
+
 
 if __name__ == "__main__":
     model()
