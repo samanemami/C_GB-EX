@@ -3,11 +3,10 @@ from cgb import cgb_clf
 import sklearn.datasets as dts
 import matplotlib.pyplot as plt
 from wrapper import classification
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
 
-def plotModel_MultiClass(X, y, clf, title=None):
+def plotModel_MultiClass(X, y, clf, title, ax):
 
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -17,12 +16,16 @@ def plotModel_MultiClass(X, y, clf, title=None):
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
 
-    plt.contourf(xx, yy, Z, alpha=0.4)
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
-    plt.title(title)
-    plt.grid(True)
-    plt.gca().set_xlim(xx.min(), xx.max())
-    plt.gca().set_ylim(yy.min(), yy.max())
+    np.savetxt("xx"+title, xx)
+    np.savetxt("yy"+title, yy)
+    np.savetxt("z"+title, Z)
+
+    ax.contourf(xx, yy, Z, alpha=0.4)
+    ax.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
+    ax.set_title(title)
+    ax.grid(True)
+    ax.gca().set_xlim(xx.min(), xx.max())
+    ax.gca().set_ylim(yy.min(), yy.max())
 
 
 X, y = dts.make_classification(n_features=2,
@@ -74,12 +77,7 @@ model_gbdtmo = classification(max_depth=5,
 model_gbdtmo.fit(X, y)
 
 
-plt.figure(num=1, figsize=(20, 7))
-plt.subplot(1, 3, 1)
-plotModel_MultiClass(X, y, cgb_, title="C-GB")
-
-plt.subplot(1, 3, 2)
-plotModel_MultiClass(X, y, mart, title="MART")
-
-plt.subplot(1, 3, 3)
-plotModel_MultiClass(X, y, model_gbdtmo, title="GBDT-MO")
+fig, ax = plt.subplots(1, 3)
+plotModel_MultiClass(X, y, cgb_, title="C-GB", ax=ax[0])
+plotModel_MultiClass(X, y, mart, title="GB", ax=ax[1])
+plotModel_MultiClass(X, y, model_gbdtmo, title="GBDT-MO", ax=ax[2])
