@@ -1,3 +1,4 @@
+import seaborn as sns
 import warnings
 import numpy as np
 import pandas as pd
@@ -8,8 +9,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
-import seaborn as sns
-
 
 
 warnings.simplefilter('ignore')
@@ -39,7 +38,7 @@ def model(max_depth, random_state):
     c_gb = cgb_reg(max_depth=max_depth,
                    subsample=0.75,
                    max_features="sqrt",
-                   learning_rate=0.2,
+                   learning_rate=0.75,
                    random_state=random_state,
                    criterion="squared_error",
                    n_estimators=100)
@@ -50,7 +49,7 @@ def model(max_depth, random_state):
     gb = GradientBoostingRegressor(max_depth=max_depth,
                                    subsample=0.75,
                                    max_features="sqrt",
-                                   learning_rate=0.2,
+                                   learning_rate=0.75,
                                    random_state=random_state,
                                    criterion="squared_error",
                                    n_estimators=100)
@@ -82,7 +81,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         c="royalblue",
         s=20,
         alpha=0.3,
-        label='C-GB=%.3f' % r2_score(y, pred_cgb)
+        label='C-GB - R2-Score: %.3f' % r2_score(y, pred_cgb)
     )
 
     axs.scatter(
@@ -93,7 +92,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         s=20,
         marker="^",
         alpha=0.3,
-        label='GB=%.3f' % r2_score(y, pred_gb),
+        label='GB - R2-Score: %.3f' % r2_score(y, pred_gb),
     )
 
     axs.set_xlabel("Heating")
@@ -128,7 +127,7 @@ if __name__ == '__main__':
 
     n = 10  # Training time
     size = (10, 7)  # Subplots size
-    depth = 10
+    depth = 5
 
     y_test = model(max_depth=depth, random_state=random_state)[2]
 
