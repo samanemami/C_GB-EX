@@ -1,14 +1,15 @@
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import r2_score, mean_squared_error
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from scipy.stats import invgauss
-import matplotlib.pyplot as plt
-from cgb import cgb_reg
-import seaborn as sns
-import pandas as pd
-import numpy as np
 import warnings
+import numpy as np
+import pandas as pd
+from cgb import cgb_reg
+import matplotlib.pyplot as plt
+from scipy.stats import invgauss
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.ensemble import GradientBoostingRegressor
+import seaborn as sns
+
 
 
 warnings.simplefilter('ignore')
@@ -161,11 +162,11 @@ if __name__ == '__main__':
     euclidean_gb = np.sqrt(np.power(y_scl - pred_gb_scl, 2).sum(axis=1))
     euclidean_cgb = np.sqrt(np.power(y_scl - pred_cgb_scl, 2).sum(axis=1))
 
-    sns.distplot(a=euclidean_gb,  kde=False, fit=invgauss,
+    sns.distplot(a=euclidean_gb,  kde=False, fit=invgauss, bins=15,
                  label='GB', color='salmon', hist_kws={"alpha": 0.6},
                  fit_kws={"color": "r", "lw": 2, "label": "GB"},
                  ax=axs1[0][1])
-    sns.distplot(a=euclidean_cgb,  kde=False, fit=invgauss,
+    sns.distplot(a=euclidean_cgb,  kde=False, fit=invgauss, bins=15,
                  label='C-GB', color='royalblue',
                  hist_kws={"histtype": "step", "linewidth": 3,
                            "alpha": 0.7},
@@ -180,12 +181,12 @@ if __name__ == '__main__':
 
     # Maximum (Between two targets) Distance
     sns.distplot(a=distance(y_scl, pred_gb_scl, np.max),  kde=False,
-                 fit=invgauss, label='GB', color='salmon',
+                 fit=invgauss, label='GB', color='salmon', bins=15,
                  hist_kws={"alpha": 0.6},
                  fit_kws={"color": "r", "lw": 2, "label": "GB"},
                  ax=axs1[1][0])
     sns.distplot(a=distance(y_scl, pred_cgb_scl, np.max),  kde=False,
-                 fit=invgauss, label='C-GB', color='royalblue',
+                 fit=invgauss, label='C-GB', color='royalblue', bins=15,
                  fit_kws={"color": "b", "lw": 2,
                           "label": "C-GB", "linestyle": "--"},
                  hist_kws={"histtype": "step", "linewidth": 3,
@@ -199,12 +200,12 @@ if __name__ == '__main__':
 
     # Minimum (Between two targets) Distance
     sns.distplot(a=distance(y_scl, pred_gb_scl, np.min),  kde=False,
-                 fit=invgauss, label='GB', color='salmon',
+                 fit=invgauss, label='GB', color='salmon', bins=15,
                  hist_kws={"alpha": 0.6},
                  fit_kws={"color": "r", "lw": 2, "label": "GB"},
                  ax=axs1[1][1])
     sns.distplot(a=distance(y_scl, pred_cgb_scl, np.min),  kde=False,
-                 fit=invgauss, label='C-GB', color='royalblue',
+                 fit=invgauss, label='C-GB', color='royalblue', bins=15,
                  fit_kws={"color": "b", "lw": 2,
                           "label": "C-GB", "linestyle": "--"},
                  hist_kws={"histtype": "step", "linewidth": 3,
