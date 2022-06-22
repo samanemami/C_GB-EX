@@ -38,7 +38,6 @@ plt.scatter(X[:, 0], X[:, 1], c=y)
 
 
 path = '/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
-tfbt_path = "Path_to_remove_tf_logs"
 
 
 cgb_ = cgb_clf(max_depth=5,
