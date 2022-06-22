@@ -6,7 +6,7 @@ from wrapper import classification
 from sklearn.ensemble import GradientBoostingClassifier
 
 
-def plotModel_MultiClass(X, y, clf, axs, title):
+def plotModel_MultiClass(X, y, clf, axs):
 
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -15,10 +15,6 @@ def plotModel_MultiClass(X, y, clf, axs, title):
 
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
-
-    np.savetxt("xx"+title, xx)
-    np.savetxt("yy"+title, yy)
-    np.savetxt("z"+title, Z)
 
     axs.contourf(xx, yy, Z, alpha=0.4)
     axs.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
