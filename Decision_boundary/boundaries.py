@@ -6,7 +6,7 @@ from wrapper import classification
 from sklearn.ensemble import GradientBoostingClassifier
 
 
-def plotModel_MultiClass(X, y, clf, axs):
+def plotModel_MultiClass(X, y, clf, axs, title):
 
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -15,11 +15,14 @@ def plotModel_MultiClass(X, y, clf, axs):
 
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
-
+    
     axs.contourf(xx, yy, Z, alpha=0.4)
     axs.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
     plt.gca().set_xlim(xx.min(), xx.max())
     plt.gca().set_ylim(yy.min(), yy.max())
+
+    axs.set_title(title)
+    axs.grid(True)
 
 
 X, y = dts.make_classification(n_features=2,
@@ -34,7 +37,7 @@ X, y = dts.make_classification(n_features=2,
 plt.scatter(X[:, 0], X[:, 1], c=y)
 
 
-path = '/lustre/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
+path = '/lustre/home/samanema/.local/lib/python3.6/site-packages/gbdtmo/build/gbdtmo.so'
 
 
 cgb_ = cgb_clf(max_depth=5,
@@ -42,19 +45,21 @@ cgb_ = cgb_clf(max_depth=5,
                max_features="sqrt",
                learning_rate=0.1,
                random_state=1,
-               n_estimators=100)
+               n_estimators=100,
+               criterion='mse')
 
 cgb_.fit(X, y)
 
 
-mart = GradientBoostingClassifier(max_depth=5,
-                                  subsample=0.75,
-                                  max_features="sqrt",
-                                  learning_rate=0.1,
-                                  random_state=1,
-                                  n_estimators=100)
+gb = GradientBoostingClassifier(max_depth=5,
+                                subsample=0.75,
+                                max_features="sqrt",
+                                learning_rate=0.1,
+                                random_state=1,
+                                criterion="mse",
+                                n_estimators=100)
 
-mart.fit(X, y)
+gb.fit(X, y)
 
 
 model_gbdtmo = classification(max_depth=5,
@@ -72,16 +77,7 @@ model_gbdtmo.fit(X, y)
 fig, axs = plt.subplots(1, 3, figsize=(15, 4), facecolor='w', edgecolor='k')
 axs = axs.ravel()
 
-
 plotModel_MultiClass(X, y, cgb_, axs=axs[0], title='C-GB')
-axs[0].set_title('C-GB')
-axs[0].grid(True)
-
-plotModel_MultiClass(X, y, mart, axs=axs[1], title='GB')
-axs[1].set_title('GB')
-axs[1].grid(True)
-
+plotModel_MultiClass(X, y, gb, axs=axs[1], title='GB')
 plotModel_MultiClass(X, y, model_gbdtmo, axs=axs[2], title='GBDT-MO')
-axs[2].set_title('GBDT-MO')
-axs[2].grid(True)
 plt.tight_layout()
