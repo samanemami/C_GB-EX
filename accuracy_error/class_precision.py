@@ -91,7 +91,7 @@ if __name__ == '__main__':
     n = 10
 
     fig, axes = plt.subplots(4, n_class, figsize=(20, 15))
-    fig.subplots_adjust(hspace=.6, wspace=0)
+    fig.subplots_adjust(hspace=.6, wspace=0.2)
 
     # Train the models for different values of the maximum depth
     yticks = np.arange(0.7, 0.9, step=0.05)
@@ -127,15 +127,12 @@ if __name__ == '__main__':
                             color='k',
                             # fontsize=10
                             )
-            axes[i][k].set_yticks(yticks, labels=[" " for _ in yticks])
+            axes[i][k].set_yticks(yticks)
             axes[i][k].grid(visible=True, axis='both')
 
-        axes[i][0].set_yticks(
-            yticks, labels=["{:.2f}".format(tick) for tick in yticks])
         axes[i][0].set_ylabel('Precision')
 
         print('*', end='')
 
-plt.legend(loc='upper center', bbox_to_anchor=(-0.5, -0.27),
+plt.legend(loc='upper center', bbox_to_anchor=(-0.7, -0.27),
            fancybox=False, shadow=False, ncol=2)
-plt.savefig('precision.jpg')
