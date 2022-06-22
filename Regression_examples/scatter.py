@@ -1,13 +1,14 @@
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from scipy.stats import invgauss
+import matplotlib.pyplot as plt
 from cgb import cgb_reg
 import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
-import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import warnings
-
 
 
 warnings.simplefilter('ignore')
@@ -97,7 +98,6 @@ def scatter(y, pred_cgb, pred_gb, axs):
     axs.set_xlabel("Heating")
     axs.set_ylabel("Cooling")
     axs.grid(True)
-    # plt.xscale("log")
     axs.legend()
 
 
@@ -115,21 +115,31 @@ def rmse(y, pred, target):
     return "RMSE: " + str("{:.2f}".format(error))
 
 
+def distance(y, pred, agg):
+    distance_ = np.zeros((y.shape[0], ))
+    for i in range(y.shape[0]):
+        distance_[i] = agg(np.sqrt(np.power(y[i, :] - pred[i, :], 2)))
+
+    return distance_
+
+
 if __name__ == '__main__':
 
-    n = 10
-    size = (10, 7)
+    n = 10  # Training time
+    size = (10, 7)  # Subplots size
+    depth = 10
 
-    y_test = model(max_depth=5, random_state=1)[2]
+    y_test = model(max_depth=depth, random_state=random_state)[2]
 
     cgb = np.zeros_like(y_test)
     gb = np.zeros_like(y_test)
     y = np.zeros_like(y_test)
 
     fig1, axs1 = plt.subplots(2, 2, figsize=size)
+
     for i in range(n):
-        pred_cgb, pred_gb, y_test = model(max_depth=5,
-                                          random_state=1)
+        pred_cgb, pred_gb, y_test = model(max_depth=depth,
+                                          random_state=random_state)
         cgb += pred_cgb
         gb += pred_gb
         y += y_test
@@ -142,54 +152,67 @@ if __name__ == '__main__':
     scatter(y, pred_cgb, pred_gb, axs1[0][0])
     axs1[0][0].set_title('Data point distribution')
 
-    euclidean_gb = np.sqrt(np.power(y - pred_gb, 2).sum(axis=1))
-    euclidean_cgb = np.sqrt(np.power(y - pred_cgb, 2).sum(axis=1))
+    # Normalizing the output space
+    scale = StandardScaler()
+    y_scl = scale.fit_transform(y)
+    pred_gb_scl = scale.fit_transform(pred_gb)
+    pred_cgb_scl = scale.fit_transform(pred_cgb)
 
-    dist_cgb = np.sqrt(np.power(y - pred_cgb, 2))
-    dist_gb = np.sqrt(np.power(y - pred_gb, 2))
+    euclidean_gb = np.sqrt(np.power(y_scl - pred_gb_scl, 2).sum(axis=1))
+    euclidean_cgb = np.sqrt(np.power(y_scl - pred_cgb_scl, 2).sum(axis=1))
 
-    sns.distplot(a=euclidean_gb, hist=True, kde=True, rug=False,
+    sns.distplot(a=euclidean_gb,  kde=False, fit=invgauss,
                  label='GB', color='salmon', hist_kws={"alpha": 0.6},
-                 kde_kws={"color": "r", "lw": 2, "label": "GB"},
+                 fit_kws={"color": "r", "lw": 2, "label": "GB"},
                  ax=axs1[0][1])
-    sns.distplot(a=euclidean_cgb, hist=True, kde=True,
-                 rug=False, label='C-GB', color='royalblue',
+    sns.distplot(a=euclidean_cgb,  kde=False, fit=invgauss,
+                 label='C-GB', color='royalblue',
                  hist_kws={"histtype": "step", "linewidth": 3,
                            "alpha": 0.7},
-                 kde_kws={"color": "b", "lw": 2, "label": "C-GB"}, ax=axs1[0][1])
+                 fit_kws={"color": "b", "lw": 2,
+                          "label": "C-GB", "linestyle": "--"},
+                 ax=axs1[0][1])
 
     axs1[0][1].set_xlabel("Euclidean Distance")
     axs1[0][1].set_title("Histogram of the euclidean distance")
     axs1[0][1].legend()
     axs1[0][1].grid(True)
 
-    # Maximum Distance
-    sns.distplot(a=np.max(dist_gb, axis=0), hist=True, kde=True,
-                 rug=False, label='GB', color='salmon', hist_kws={"alpha": 0.6},
-                 kde_kws={"color": "r", "lw": 2, "label": "KGB"}, ax=axs1[1][0])
-    sns.distplot(a=np.max(dist_cgb, axis=0), hist=True, kde=True,
-                 rug=False, label='C-GB', color='royalblue',
-                 kde_kws={"color": "b", "lw": 2, "label": "C-GB"},
+    # Maximum (Between two targets) Distance
+    sns.distplot(a=distance(y_scl, pred_gb_scl, np.max),  kde=False,
+                 fit=invgauss, label='GB', color='salmon',
+                 hist_kws={"alpha": 0.6},
+                 fit_kws={"color": "r", "lw": 2, "label": "GB"},
+                 ax=axs1[1][0])
+    sns.distplot(a=distance(y_scl, pred_cgb_scl, np.max),  kde=False,
+                 fit=invgauss, label='C-GB', color='royalblue',
+                 fit_kws={"color": "b", "lw": 2,
+                          "label": "C-GB", "linestyle": "--"},
                  hist_kws={"histtype": "step", "linewidth": 3,
-                           "alpha": 0.7}, ax=axs1[1][0])
-
-    # Minimum Distance
-    sns.distplot(a=np.min(dist_gb, axis=0), hist=True, kde=True,
-                 rug=False, label='GB', color='salmon', hist_kws={"alpha": 0.6},
-                 kde_kws={"color": "r", "lw": 2, "label": "GB"}, ax=axs1[1][1])
-    sns.distplot(a=np.min(dist_cgb, axis=0), hist=True, kde=True,
-                 rug=False, label='C-GB', color='royalblue',
-                 kde_kws={"color": "b", "lw": 2, "label": "C-GB"},
-                 hist_kws={"histtype": "step", "linewidth": 3,
-                           "alpha": 0.7}, ax=axs1[1][1])
+                           "alpha": 0.7},
+                 ax=axs1[1][0])
 
     axs1[1][0].set_xlabel("Distance")
-    axs1[1][0].set_title("Maximum Distance")
+    axs1[1][0].set_title("Maximum Distance (Between targets)")
     axs1[1][0].legend()
     axs1[1][0].grid(True)
 
+    # Minimum (Between two targets) Distance
+    sns.distplot(a=distance(y_scl, pred_gb_scl, np.min),  kde=False,
+                 fit=invgauss, label='GB', color='salmon',
+                 hist_kws={"alpha": 0.6},
+                 fit_kws={"color": "r", "lw": 2, "label": "GB"},
+                 ax=axs1[1][1])
+    sns.distplot(a=distance(y_scl, pred_cgb_scl, np.min),  kde=False,
+                 fit=invgauss, label='C-GB', color='royalblue',
+                 fit_kws={"color": "b", "lw": 2,
+                          "label": "C-GB", "linestyle": "--"},
+                 hist_kws={"histtype": "step", "linewidth": 3,
+                           "alpha": 0.7},
+                 ax=axs1[1][1])
+
     axs1[1][1].set_xlabel("Distance")
-    axs1[1][1].set_title("Minimum Distance")
+    axs1[1][1].set_title("Minimum Distance (Between targets)")
     axs1[1][1].legend()
     axs1[1][1].grid(True)
 
@@ -247,3 +270,4 @@ if __name__ == '__main__':
 
     fig2.suptitle('The relationship between predicted and real data points')
     fig2.savefig('Hexbin.eps')
+    plt.close('all')
