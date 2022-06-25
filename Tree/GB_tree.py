@@ -1,16 +1,16 @@
-from sklearn.ensemble import GradientBoostingClassifier
-from scipy.interpolate import make_interp_spline
-from sklearn.tree import plot_tree
-import matplotlib.pyplot as plt
-import sklearn.datasets as dts
-from cgb import cgb_clf
-import numpy as np
 import warnings
+import numpy as np
+from cgb import cgb_clf
+import sklearn.datasets as dts
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+from scipy.interpolate import make_interp_spline
+from sklearn.ensemble import GradientBoostingClassifier
+
 
 
 warnings.simplefilter("ignore")
 np.random.seed(1)
-
 n_classes = 3
 
 X, y = dts.make_classification(n_features=2,
@@ -29,62 +29,28 @@ def plot(tree, axs):
               precision=2, ax=axs, label="root")
 
 
-def terminal_leaves(model, tree, class_):
-    # Return the terminal regions values
+def boundaries(X, model, tree, class_, axs):
+
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.1),
+                         np.arange(y_min, y_max, 0.1))
+
     if model.estimators_.shape[1] > 2:
-        est = model.estimators_[tree][class_]
+        tree_ = model.estimators_[tree][class_]
+        Z = tree_.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+
     else:
-        est = model.estimators_[tree][0]
-    children_left = est.tree_.children_left
-    children_right = est.tree_.children_right
-    n_nodes = est.tree_.node_count
-    is_leaves = np.zeros(shape=n_nodes, dtype=bool)
+        tree_ = model.estimators_[tree][0]
+        Z = tree_.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z[:, class_].reshape(xx.shape)
 
-    stack = [(0, 0)]  # start with the root node id (0) and its depth (0)
-    while len(stack) > 0:
-        # `pop` ensures each node is only visited once
-        node_id, depth = stack.pop()
-
-        # If the left and right child of a node is not the same we have a split
-        # node
-        is_split_node = children_left[node_id] != children_right[node_id]
-
-        if is_split_node:
-            stack.append((children_left[node_id], depth + 1))
-            stack.append((children_right[node_id], depth + 1))
-        else:
-            is_leaves[node_id] = True
-    terminal_leave = est.tree_.value[np.where(is_leaves == True)]
-    if model.estimators_.shape[1] > 2:
-        terminal_leave = terminal_leave.reshape(-1, 1)[:, 0]
-    else:
-        terminal_leave = terminal_leave[:, :, 0]
-    return terminal_leave
-
-
-def impurity(model, tree, class_):
-
-    # Return the impurity values
-    if model.estimators_.shape[1] > 2:
-        est = model.estimators_[tree][class_]
-    else:
-        est = model.estimators_[tree][0]
-    impurity = est.tree_.impurity
-
-    return impurity
-
-
-def interpolating(data):
-
-    # To smooth the plots
-    y = [i for i in range(data.shape[0])]
-    idx = range(len(y))
-    x = np.linspace(min(idx), max(idx), 300)
-
-    spl = make_interp_spline(idx, data, k=3)
-    smooth = spl(x)
-
-    return x, smooth
+    axs.contourf(xx, yy, Z, alpha=0.4)
+    axs.set_title("class " + str(class_))
+    plt.gca().set_xlim(xx.min(), xx.max())
+    plt.gca().set_ylim(yy.min(), yy.max())
+    axs.grid(True)
 
 
 def model(random_state=1):
@@ -120,70 +86,23 @@ def model(random_state=1):
 
     plot(tree_cgb, axs=axs1)
 
-    terminal_leave_CGB = terminal_leaves(cgb, 0, 0)
-
     for i in range(n_classes):
 
         tree_gb = gb.estimators_[0][i]
+        boundaries(X=X, model=cgb, tree=0, class_=i, axs=axs3[i])
+        boundaries(X=X, model=gb, tree=0, class_=i, axs=axs4[i])
         j = i
         if j < 2:
             plot(tree_gb, axs2[j])
         j += 1
 
-        axs3[i].plot(terminal_leave_CGB[:, i], color='b',
-                     label="C-GB", linestyle="--", linewidth=3)
+    fig3.suptitle("CGB Boundaries")
+    fig4.suptitle("GB Boundaries")
 
-        axs3[i].plot(terminal_leaves(gb, 0, i), color='r',
-                     label="GB")
-
-        axs3[i].set_title("class_" + str(i))
-        axs3[i].set_xlabel("Leave number")
-        axs3[i].grid(True)
-
-        axs3[i].text(0.02, 0.2, 'Number of leaves (GB)='+str(tree_gb.tree_.n_leaves),
-                     verticalalignment='bottom',
-                     horizontalalignment='left',
-                     transform=axs3[i].transAxes,
-                     color='r',
-                     fontsize=10,
-                     rotation=90
-                     )
-
-        axs3[i].text(.98, 0.2, 'Number of leaves (C-GB)='+str(tree_cgb.tree_.n_leaves),
-                     verticalalignment='bottom',
-                     horizontalalignment='center',
-                     transform=axs3[i].transAxes,
-                     color='b',
-                     fontsize=10,
-                     rotation=90
-                     )
-
-        axs4[i].plot(impurity(cgb, 0, 0), color='b',
-                     label="C-GB", linestyle="--", linewidth=3)
-
-        axs4[i].plot(impurity(gb, 0, i), color='r',
-                     label="GB")
-
-        axs4[i].set_title("all classes (GB) \n" + "class_" + str(i) + " (GB)")
-        axs4[i].set_xlabel("Tree nodes")
-        axs4[i].grid(True)
-
-    axs3[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    axs3[0].set_ylabel("Leave value")
-
-    axs4[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    axs4[0].set_ylabel("MSE")
-
-    fig3.suptitle("Terminal leaves values of the first tree")
-    fig4.suptitle("Impurity value of the first tree")
-
-    fig4.tight_layout()
-    fig3.tight_layout()
-
-    fig1.savefig("C_GB_Tree.jpg")
-    fig2.savefig("GB_Tree.jpg")
-    fig3.savefig("leaves_values.jpg")
-    fig4.savefig("impurity.jpg")
+    fig1.savefig("C_GB_Tree.jpg", dpi=1000)
+    fig2.savefig("GB_Tree.jpg", dpi=1000)
+    fig3.savefig("CGB_boundaries.jpg", dpi=1000)
+    fig4.savefig("GB_boundaries.jpg", dpi=1000)
 
 
 if __name__ == "__main__":
