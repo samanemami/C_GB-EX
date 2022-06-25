@@ -136,3 +136,4 @@ if __name__ == '__main__':
 
 plt.legend(loc='upper center', bbox_to_anchor=(-0.7, -0.27),
            fancybox=False, shadow=False, ncol=2)
+plt.savefig('precision.jpg')
