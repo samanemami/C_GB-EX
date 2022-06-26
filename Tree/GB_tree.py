@@ -53,8 +53,9 @@ def boundaries(X, y, model, tree, title, axs):
     Z = np.argmax(proba, axis=1)
     Z = Z.reshape(xx.shape)
 
-    axs.scatter(X[:, 0], X[:, 1], c=y, s=30, edgecolor='k')
-    axs.contourf(xx, yy, Z, alpha=0.4)
+    axs.contourf(xx, yy, Z, alpha=1)
+    axs.scatter(X[:, 0], X[:, 1], c=y, s=40, edgecolor='k')
+    
 
     axs.set_title(title)
 
@@ -111,6 +112,7 @@ def model(random_state=1):
     boundaries(X=X, y=y, model=gb, tree=0, title='GB', axs=axs3[1])
 
     fig3.suptitle("Decision Boundaries for the first Decision Tree Regressor")
+
 
 if __name__ == "__main__":
     model()
