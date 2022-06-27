@@ -1,11 +1,13 @@
-import warnings
-import numpy as np
-from cgb import cgb_clf
-import sklearn.datasets as dts
-import matplotlib.pyplot as plt
-from sklearn.tree import plot_tree
-from scipy.special import logsumexp
+from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.ensemble import GradientBoostingClassifier
+from scipy.special import logsumexp
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+import sklearn.datasets as dts
+from cgb import cgb_clf
+import numpy as np
+import warnings
+
 
 warnings.simplefilter("ignore")
 np.random.seed(1)
@@ -55,7 +57,6 @@ def boundaries(X, y, model, tree, title, axs):
 
     axs.contourf(xx, yy, Z, alpha=1)
     axs.scatter(X[:, 0], X[:, 1], c=y, s=40, edgecolor='k')
-    
 
     axs.set_title(title)
 
@@ -91,6 +92,7 @@ def model(random_state=1):
     fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor="w")
     fig2, axs2 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
     fig3, axs3 = plt.subplots(1, 2, figsize=(10, 4), facecolor="w")
+    fig4, axs4 = plt.subplots(1, 3, figsize=(10, 3), facecolor="w")
 
     for i in range(1, 3):
         exec(f'fig{i}.subplots_adjust(hspace=-0.5, wspace=-0.15)')
@@ -102,6 +104,11 @@ def model(random_state=1):
     # Plot two first class only
     for i in range(n_classes):
         tree_gb = gb.estimators_[0][i]
+
+        DecisionBoundaryDisplay.from_estimator(
+            estimator=gb.estimators_[0][i], X=X, response_method='predict', ax=axs4[i])
+        axs4[i].set_title("class " + str(i))
+
         j = i
         if j < 2:
             plot(tree_gb, axs2[j])
@@ -112,7 +119,9 @@ def model(random_state=1):
     boundaries(X=X, y=y, model=gb, tree=0, title='GB', axs=axs3[1])
 
     fig3.suptitle("Decision Boundaries for the first Decision Tree Regressor")
-
+    fig4.suptitle(
+        "Decision Boundaries for the first three trees (three classes)")
+    fig4.tight_layout()
 
 if __name__ == "__main__":
     model()
