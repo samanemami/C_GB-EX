@@ -1,12 +1,12 @@
-from sklearn.inspection import DecisionBoundaryDisplay
-from sklearn.ensemble import GradientBoostingClassifier
-from scipy.special import logsumexp
-from sklearn.tree import plot_tree
-import matplotlib.pyplot as plt
-import sklearn.datasets as dts
-from cgb import cgb_clf
-import numpy as np
 import warnings
+import numpy as np
+from cgb import cgb_clf
+import sklearn.datasets as dts
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+from scipy.special import logsumexp
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.inspection import DecisionBoundaryDisplay
 
 
 warnings.simplefilter("ignore")
@@ -55,6 +55,8 @@ def boundaries(X, y, model, tree, title, axs):
     Z = np.argmax(proba, axis=1)
     Z = Z.reshape(xx.shape)
 
+    CS = axs.contourf(xx, yy, Z, 10, cmap='viridis')
+
     axs.contourf(xx, yy, Z, alpha=1)
     axs.scatter(X[:, 0], X[:, 1], c=y, s=40, edgecolor='k')
 
@@ -64,6 +66,8 @@ def boundaries(X, y, model, tree, title, axs):
     plt.gca().set_ylim(yy.min(), yy.max())
 
     axs.grid(True)
+
+    return CS
 
 
 def model(random_state=1):
@@ -97,8 +101,6 @@ def model(random_state=1):
     for i in range(1, 3):
         exec(f'fig{i}.subplots_adjust(hspace=-0.5, wspace=-0.15)')
 
-    fig3.subplots_adjust(hspace=0.9,  wspace=0.1)
-
     plot(tree_cgb, axs=axs1)
 
     # Plot two first class only
@@ -108,6 +110,7 @@ def model(random_state=1):
         DecisionBoundaryDisplay.from_estimator(
             estimator=gb.estimators_[0][i], X=X, response_method='predict', ax=axs4[i])
         axs4[i].set_title("class " + str(i))
+        axs4[i].scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
 
         j = i
         if j < 2:
@@ -115,13 +118,17 @@ def model(random_state=1):
         j += 1
 
     # Plot Decision Boundaries
-    boundaries(X=X, y=y, model=cgb, tree=0, title='C-GB', axs=axs3[0])
-    boundaries(X=X, y=y, model=gb, tree=0, title='GB', axs=axs3[1])
+    for i, m in enumerate([cgb, gb]):
+        CS = boundaries(X=X, y=y, model=m, tree=0,
+                        title='C-GB' if i == 0 else 'GB', axs=axs3[i])
+        fig3.colorbar(CS, ax=axs3[i])
 
     fig3.suptitle("Decision Boundaries for the first Decision Tree Regressor")
     fig4.suptitle(
         "Decision Boundaries for the first three trees (three classes)")
     fig4.tight_layout()
+    fig3.tight_layout()
+
 
 if __name__ == "__main__":
     model()
