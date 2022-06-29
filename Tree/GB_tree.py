@@ -1,11 +1,11 @@
-import warnings
-import numpy as np
-from cgb import cgb_clf
-import sklearn.datasets as dts
-import matplotlib.pyplot as plt
-from sklearn.tree import plot_tree
-from scipy.special import logsumexp
 from sklearn.ensemble import GradientBoostingClassifier
+from scipy.special import logsumexp
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+import sklearn.datasets as dts
+from cgb import cgb_clf
+import numpy as np
+import warnings
 
 
 warnings.simplefilter("ignore")
@@ -31,8 +31,9 @@ def plot(tree, axs):
 def boundaries(X=np.array,
                y=np.array,
                model=np.array,
-               tree=0,
+               tree=-1,
                class_=-1,
+               regression=True,
                title='title',
                axs=plt.axes):
 
@@ -42,7 +43,6 @@ def boundaries(X=np.array,
     n_classes = len(np.unique(y))
     n_estimator = model.get_params()['n_estimators']
     learning_rate = model.get_params()['learning_rate']
-    regression = True if class_ >= 0 else False
 
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
@@ -51,36 +51,44 @@ def boundaries(X=np.array,
 
     pred = np.zeros((xx.ravel().shape[0], n_classes))
 
-    if model.estimators_.shape[1] > 2:
-        if not regression:
-            # Plot the Decision boundary for one tree only
-            for i in range(n_classes):
-                tree_ = model.estimators_[tree][i]
-                pred_ = tree_.predict(np.c_[xx.ravel(), yy.ravel()])
-                pred[:, i] = pred_ * learning_rate
-        else:
-            # Plot the Decision boundary for all of the trees
-            for c in range(n_classes):
-                for i in range(n_estimator):
-                    tree_ = model.estimators_[i][c]
-                    pred[:, c] += (learning_rate *
-                                   tree_.predict(np.c_[xx.ravel(),
-                                                       yy.ravel()]))
-    else:
-        if not regression:
-            # Plot the Decision boundary for one tree only
-            tree_ = model.estimators_[tree][0]
-            pred_ = tree_.predict(np.c_[xx.ravel(), yy.ravel()])
-            pred = pred_ * learning_rate
-        else:
-            # Plot the Decision boundary for all of the trees
-            for i in range(n_estimator):
-                tree_ = model.estimators_[i][0]
-                pred += (learning_rate *
-                         tree_.predict(np.c_[xx.ravel(),
-                                             yy.ravel()]))
+    def pred_gb(n_classes, tree):
+        pred_ = np.zeros_like(pred)
+        for i in range(n_classes):
+            tree_ = model.estimators_[tree][i]
+            pred_[:, i] = (learning_rate *
+                           tree_.predict(np.c_[xx.ravel(),
+                                               yy.ravel()]))
+        return pred_
 
-    if not regression:
+    if model.estimators_.shape[1] > 2:
+        for i in range(n_estimator):
+            pred_ = pred_gb(n_classes=n_classes, tree=i)
+            pred += pred_
+
+            if i == tree:
+                print('break')
+                pred = pred_
+                break
+
+    else:
+        for i in range(n_estimator):
+            tree_ = model.estimators_[i][0]
+            pred_ = (learning_rate *
+                     tree_.predict(np.c_[xx.ravel(),
+                                         yy.ravel()]))
+            pred += pred_
+            if i == tree:
+                pred = pred_
+                break
+            else:
+                continue
+
+    if regression:
+        # Return Decision boundary for all tree and predict (Regression)
+        Z = pred[:, class_].reshape(xx.shape)
+        axs.contourf(xx, yy, Z, level, alpha=1, cmap=cm)
+        CS = axs.contourf(xx, yy, Z, level, cmap=cm, shrink=0.9)
+    else:
         # Return Decision boundary for one tree and predict_proba (classification).
         proba = np.nan_to_num(
             np.exp(pred - (logsumexp(pred, axis=1)[:, np.newaxis])))
@@ -91,12 +99,6 @@ def boundaries(X=np.array,
         CS = axs.contourf(xx, yy, Z, level, cmap=cm, shrink=0.9)
         axs.contour(xx, yy, Z, [0.0], linewidths=2, colors='k')
         axs.scatter(X[:, 0], X[:, 1], c=y, s=40, edgecolor='k')
-    else:
-        # Return Decision boundary for one tree and predict (Regression)
-        Z = pred[:, class_].reshape(xx.shape)
-
-        axs.contourf(xx, yy, Z, level, alpha=1, cmap=cm)
-        CS = axs.contourf(xx, yy, Z, level, cmap=cm, shrink=0.9)
 
     axs.set_title(title)
 
@@ -135,6 +137,7 @@ def model(random_state=1):
     fig2, axs2 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
     fig3, axs3 = plt.subplots(1, 2, figsize=(10, 4), facecolor="w")
     fig4, axs4 = plt.subplots(2, 3, figsize=(20, 7), facecolor="w")
+    fig5, axs5 = plt.subplots(2, 3, figsize=(20, 7), facecolor="w")
 
     for i in range(1, 3):
         exec(f'fig{i}.subplots_adjust(hspace=-0.5, wspace=-0.15)')
@@ -149,16 +152,25 @@ def model(random_state=1):
             plot(tree_gb, axs2[j])
         j += 1
 
-        CS = boundaries(X=X, y=y, model=cgb, class_=i,
+        # Boundaries for all the tress
+        CS = boundaries(X=X, y=y, model=cgb, tree=-1, class_=i, regression=True,
                         title='C-GB-class:' + str(i), axs=axs4[0][i])
         fig4.colorbar(CS, ax=axs4[0][i])
-        CS = boundaries(X=X, y=y, model=gb, class_=i,
+        CS = boundaries(X=X, y=y, model=gb, tree=-1, class_=i, regression=True,
                         title='GB-class:' + str(i), axs=axs4[1][i])
         fig4.colorbar(CS, ax=axs4[1][i])
 
+        # Boundaries for one tree
+        CS = boundaries(X=X, y=y, model=cgb, tree=0, class_=i, regression=True,
+                        title='C-GB-class:' + str(i), axs=axs5[0][i])
+        fig5.colorbar(CS, ax=axs5[0][i])
+        CS = boundaries(X=X, y=y, model=gb, tree=0, class_=i, regression=True,
+                        title='GB-class:' + str(i), axs=axs5[1][i])
+        fig5.colorbar(CS, ax=axs5[1][i])
+
     # Plot Decision Boundaries
     for i, m in enumerate([cgb, gb]):
-        CS = boundaries(X=X, y=y, model=m, tree=0, class_=-1,
+        CS = boundaries(X=X, y=y, model=m, tree=0, class_=-1, regression=False,
                         title='C-GB' if i == 0 else 'GB', axs=axs3[i])
         fig3.colorbar(CS, ax=axs3[i])
 
@@ -166,8 +178,12 @@ def model(random_state=1):
         "Decision Boundaries for the first Decision Tree Regressor (Predicted values)")
     fig4.suptitle(
         "Decision Boundaries of each class (Terminal values of regression trees)")
-    fig4.tight_layout()
+    fig5.suptitle(
+        "Decision Boundaries of each class (Terminal values of first regression trees)")
     fig3.tight_layout()
+    fig4.tight_layout()
+    fig5.tight_layout()
+
 
 if __name__ == "__main__":
     model()
