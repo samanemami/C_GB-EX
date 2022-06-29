@@ -66,7 +66,6 @@ def boundaries(X=np.array,
             pred += pred_
 
             if i == tree:
-                print('break')
                 pred = pred_
                 break
 
