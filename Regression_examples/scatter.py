@@ -6,13 +6,13 @@ from cgb import cgb_reg
 import matplotlib.pyplot as plt
 from scipy.stats import invgauss
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
 
 
 warnings.simplefilter('ignore')
-random_state = 123
+random_state = 1
 np.random.seed(random_state)
 
 
@@ -32,33 +32,48 @@ def model(max_depth, random_state):
 
     X, y = data()
 
-    x_train, x_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=random_state)
+    kfold = KFold(n_splits=10, shuffle=True, random_state=random_state)
+    pred_cgb = np.zeros_like(y)
+    pred_gb = np.zeros_like(y)
 
-    c_gb = cgb_reg(max_depth=max_depth,
-                   subsample=0.75,
-                   max_features="sqrt",
-                   learning_rate=0.75,
-                   random_state=random_state,
-                   criterion="squared_error",
-                   n_estimators=100)
+    for i, (train_index, test_index) in enumerate(kfold.split(X, y)):
+        x_train, x_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
 
-    c_gb.fit(x_train, y_train)
-    pred_cgb = c_gb.predict(x_test)
+        c_gb = cgb_reg(max_depth=5,
+                       subsample=0.75,
+                       #    max_features="sqrt",
+                       learning_rate=0.1,
+                       random_state=random_state,
+                       criterion="squared_error",
+                       n_estimators=100)
 
-    gb = GradientBoostingRegressor(max_depth=max_depth,
-                                   subsample=0.75,
-                                   max_features="sqrt",
-                                   learning_rate=0.75,
-                                   random_state=random_state,
-                                   criterion="squared_error",
-                                   n_estimators=100)
-    pred_gb = np.zeros_like(y_test)
-    for i in range(y_train.shape[1]):
-        gb.fit(x_train, y_train[:, i])
-        pred_gb[:, i] = gb.predict(x_test)
+        c_gb.fit(x_train, y_train)
+        pred_cgb[test_index] = c_gb.predict(x_test)
 
-    return pred_cgb, pred_gb, y_test
+        gb = GradientBoostingRegressor(max_depth=2,
+                                       subsample=1,
+                                       #    max_features="sqrt",
+                                       learning_rate=0.5,
+                                       random_state=random_state,
+                                       criterion="squared_error",
+                                       n_estimators=100)
+
+        gb.fit(x_train, y_train[:, 0])
+        pred_gb[test_index, 0] = gb.predict(x_test)
+
+        gb = GradientBoostingRegressor(max_depth=5,
+                                       subsample=0.75,
+                                       #    max_features="sqrt",
+                                       learning_rate=0.1,
+                                       random_state=random_state,
+                                       criterion="squared_error",
+                                       n_estimators=100)
+
+        gb.fit(x_train, y_train[:, 1])
+        pred_gb[test_index, 1] = gb.predict(x_test)
+
+    return pred_cgb, pred_gb, y
 
 
 def scatter(y, pred_cgb, pred_gb, axs):
@@ -125,32 +140,23 @@ def distance(y, pred, agg):
 
 if __name__ == '__main__':
 
-    n = 10  # Training times
     size = (10, 7)  # Subplots size
     depth = 5
 
-    y_test = model(max_depth=depth, random_state=random_state)[2]
-
-    cgb = np.zeros_like(y_test)
-    gb = np.zeros_like(y_test)
-    y = np.zeros_like(y_test)
-
+    fig0, axs0 = plt.subplots(1, 1)
     fig1, axs1 = plt.subplots(2, 2, figsize=size)
+    fig2, axs2 = plt.subplots(1, 2, figsize=(10, 5))
+    fig3, axs3 = plt.subplots(2, 2, figsize=size)
+    fig3.subplots_adjust(hspace=0, wspace=0)
 
-    for i in range(n):
-        pred_cgb, pred_gb, y_test = model(max_depth=depth,
-                                          random_state=random_state)
-        cgb += pred_cgb
-        gb += pred_gb
-        y += y_test
-
-    pred_cgb = cgb / n
-    pred_gb = gb / n
-    y = y/n
+    pred_cgb, pred_gb, y = model(max_depth=depth,
+                                 random_state=random_state)
 
     # Plot the Scatter, and histograms
     scatter(y, pred_cgb, pred_gb, axs1[0][0])
+    scatter(y, pred_cgb, pred_gb, axs0)
     axs1[0][0].set_title('Data point distribution')
+    axs0.set_title('Data point distribution')
 
     # Normalizing the output space
     scale = StandardScaler()
@@ -224,8 +230,20 @@ if __name__ == '__main__':
     print('Max_ave_GB:', np.mean(max_dist_gb))
 
     # Compute the Pearson Correlation between the pairwise targets
-    ((pd.DataFrame(y_scl - pred_cgb_scl)).corr('pearson')).to_csv('corr_CGB.csv')
-    ((pd.DataFrame(y_scl - pred_gb_scl)).corr('pearson')).to_csv('corr_GB.csv')
+    diff_gb = y_scl - pred_gb_scl
+    diff_cgb = y_scl - pred_cgb_scl
+    ((pd.DataFrame(diff_cgb)).corr('pearson')).to_csv('corr_CGB.csv')
+    ((pd.DataFrame(diff_gb)).corr('pearson')).to_csv('corr_GB.csv')
+
+    axs2[0].scatter(diff_gb[:, 0], diff_gb[:, 1])
+    axs2[1].scatter(diff_cgb[:, 0], diff_cgb[:, 1])
+    for i in range(2):
+        axs2[i].set_xlabel("target_0_Heating")
+        axs2[i].set_ylabel("target_1_Cooling")
+    axs2[0].set_title("GB")
+    axs2[1].set_title("CGB")
+    fig2.suptitle("Difference between real and predicted values")
+    fig2.savefig('scatter_corr.eps')
 
     axs1[1][1].set_xlabel("Distance")
     axs1[1][1].set_title("Minimum Distance (Between targets)")
@@ -235,55 +253,55 @@ if __name__ == '__main__':
     fig1.suptitle("Comparing C-GB and GB")
     fig1.tight_layout()
     fig1.savefig('regression_plt.eps')
+
+    fig0.tight_layout()
+    fig1.savefig('regression_plt_datapoints.eps')
     plt.close('all')
 
     # Plot the hexbin
-    fig2, axs2 = plt.subplots(2, 2, figsize=size)
-    fig2.subplots_adjust(hspace=0, wspace=0)
-
     labels = ["Heating", "Cooling"]
     for target, lb in enumerate(labels):
         plt.cla()
 
-        axs2[target, 0].hexbin(y[:, target], pred_cgb[:, target], gridsize=15,
+        axs3[target, 0].hexbin(y[:, target], pred_cgb[:, target], gridsize=15,
                                mincnt=1, edgecolors="none", cmap="viridis",
                                label=rmse(y, pred_cgb, target))
-        axs2[target, 0].scatter(
-            y_test[:, target], pred_cgb[:, target], s=2, c="white")
-        axs2[target, 0].set_xlabel('real values')
-        axs2[target, 0].text(0.95, 0.1, 'target: ' + lb,
+        axs3[target, 0].scatter(
+            y[:, target], pred_cgb[:, target], s=2, c="white")
+        axs3[target, 0].set_xlabel('real values')
+        axs3[target, 0].text(0.95, 0.1, 'target: ' + lb,
                              verticalalignment='bottom',
                              horizontalalignment='right',
-                             transform=axs2[target, 0].transAxes,
+                             transform=axs3[target, 0].transAxes,
                              color='k',
                              )
-        axs2[target, 0].legend(loc=2)
+        axs3[target, 0].legend(loc=2)
 
         plt.cla()
 
-        axs2[target, 1].hexbin(y_test[:, target], pred_gb[:, target], gridsize=15,
+        axs3[target, 1].hexbin(y[:, target], pred_gb[:, target], gridsize=15,
                                mincnt=1, edgecolors="none", cmap="viridis",
                                label=rmse(y, pred_gb, target))
-        axs2[target, 1].scatter(
-            y_test[:, target], pred_gb[:, target], s=2, c="white")
-        axs2[target, 1].set_xlabel('real values')
-        axs2[target, 1].text(0.95, 0.1, 'target: ' + lb,
+        axs3[target, 1].scatter(
+            y[:, target], pred_gb[:, target], s=2, c="white")
+        axs3[target, 1].set_xlabel('real values')
+        axs3[target, 1].text(0.95, 0.1, 'target: ' + lb,
                              verticalalignment='bottom',
                              horizontalalignment='right',
-                             transform=axs2[target, 1].transAxes,
+                             transform=axs3[target, 1].transAxes,
                              color='k',
                              )
-        axs2[target, 1].legend(loc=2)
+        axs3[target, 1].legend(loc=2)
 
-    axs2[0, 0].set_ylabel('predicted values')
-    axs2[1, 0].set_ylabel('predicted values')
+    axs3[0, 0].set_ylabel('predicted values')
+    axs3[1, 0].set_ylabel('predicted values')
 
-    axs2[0, 1].set_yticks([])
-    axs2[1, 1].set_yticks([])
+    axs3[0, 1].set_yticks([])
+    axs3[1, 1].set_yticks([])
 
-    axs2[0, 0].set_title('C-GB')
-    axs2[0, 1].set_title('GB')
+    axs3[0, 0].set_title('C-GB')
+    axs3[0, 1].set_title('GB')
 
-    fig2.suptitle('The relationship between predicted and real data points')
-    fig2.savefig('Hexbin.eps')
+    fig3.suptitle('The relationship between predicted and real data points')
+    fig3.savefig('Hexbin.eps')
     plt.close('all')
