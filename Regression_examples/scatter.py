@@ -1,17 +1,14 @@
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import r2_score, mean_squared_error
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from scipy.stats import pearsonr
-from scipy.stats import invgauss
-import matplotlib.pyplot as plt
-from cgb import cgb_reg
-import seaborn as sns
-import pandas as pd
-import numpy as np
 import warnings
-
-
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from cgb import cgb_reg
+import matplotlib.pyplot as plt
+from scipy.stats import invgauss
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.ensemble import GradientBoostingRegressor
 
 
 warnings.simplefilter('ignore')
@@ -218,7 +215,7 @@ if __name__ == '__main__':
                            },
                  ax=axs1[1][1])
 
-    # Compute the average of Maximum and Minimum 
+    # Compute the average of Maximum and Minimum
     # distance between the predicted and real values
     print('Min_ave_CGB:', np.mean(min_dist_cgb))
     print('Max_ave_CGB:', np.mean(max_dist_cgb))
@@ -226,16 +223,9 @@ if __name__ == '__main__':
     print('Min_ave_GB:', np.mean(min_dist_gb))
     print('Max_ave_GB:', np.mean(max_dist_gb))
 
-
     # Compute the Pearson Correlation between the pairwise targets
-    corr = pd.DataFrame(
-        data=None, index=["Correlation"], columns=["CGB", "GB"])
-    corr.iloc[:, 0] = (pearsonr((y_scl[:, 0] - pred_cgb_scl[:, 0]),
-                                (y_scl[:, 1] - pred_cgb_scl[:, 1]))[0])
-    corr.iloc[:, 1] = (pearsonr((y_scl[:, 0] - pred_gb_scl[:, 0]),
-                                (y_scl[:, 1] - pred_gb_scl[:, 1]))[0])
-
-    print(corr)
+    ((pd.DataFrame(y_scl - pred_cgb_scl)).corr('pearson')).to_csv('corr_CGB.csv')
+    ((pd.DataFrame(y_scl - pred_gb_scl)).corr('pearson')).to_csv('corr_GB.csv')
 
     axs1[1][1].set_xlabel("Distance")
     axs1[1][1].set_title("Minimum Distance (Between targets)")
