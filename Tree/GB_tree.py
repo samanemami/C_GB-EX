@@ -17,8 +17,8 @@ X, y = dts.make_classification(n_features=2,
                                n_informative=2,
                                random_state=2,
                                n_clusters_per_class=1,
-                               n_classes=n_classes,
-                               n_samples=100,
+                               n_classes=3,
+                               n_samples=1200,
                                flip_y=0.15)
 
 
@@ -111,8 +111,10 @@ def boundaries(X=np.array,
 
 def model(random_state=1):
 
-    cgb = cgb_clf(max_depth=5,
-                  subsample=0.75,
+    max_depth = 3
+
+    cgb = cgb_clf(max_depth=max_depth,
+                  subsample=1,
                   max_features="sqrt",
                   learning_rate=0.1,
                   random_state=random_state,
@@ -120,8 +122,8 @@ def model(random_state=1):
                   criterion="squared_error")
     cgb.fit(X, y)
 
-    gb = GradientBoostingClassifier(max_depth=5,
-                                    subsample=0.75,
+    gb = GradientBoostingClassifier(max_depth=max_depth,
+                                    subsample=1,
                                     max_features="sqrt",
                                     learning_rate=0.1,
                                     random_state=random_state,
@@ -132,24 +134,30 @@ def model(random_state=1):
 
     tree_cgb = cgb.estimators_.reshape(-1)[0]
 
-    fig1, axs1 = plt.subplots(1, 1, figsize=(10, 3), facecolor="w")
-    fig2, axs2 = plt.subplots(1, 2, figsize=(30, 7), facecolor="w")
+    fig1, axs1 = plt.subplots(1, 1, figsize=(6, 3), facecolor="w")
+
     fig3, axs3 = plt.subplots(1, 2, figsize=(10, 4), facecolor="w")
     fig4, axs4 = plt.subplots(2, 3, figsize=(20, 7), facecolor="w")
     fig5, axs5 = plt.subplots(2, 3, figsize=(20, 7), facecolor="w")
 
+    fig2, axs2 = plt.subplots(1, 1, figsize=(6, 3), facecolor="w")
+    fig6, axs6 = plt.subplots(1, 1, figsize=(6, 3), facecolor="w")
+    fig7, axs7 = plt.subplots(1, 1, figsize=(6, 3), facecolor="w")
+
+    fig2.subplots_adjust(hspace=-2, wspace=-10)
+    fig6.subplots_adjust(hspace=-2, wspace=-10)
+    fig7.subplots_adjust(hspace=-2, wspace=-10)
+
     for i in range(1, 3):
-        exec(f'fig{i}.subplots_adjust(hspace=-0.5, wspace=-0.15)')
+        exec(f'fig{i}.subplots_adjust(hspace=0.5, wspace=0.05)')
 
     plot(tree_cgb, axs=axs1)
 
-    # Plot (Tree) two first class only
+    plot(gb.estimators_[0][0], axs2)
+    plot(gb.estimators_[0][1], axs6)
+    plot(gb.estimators_[0][2], axs7)
+
     for i in range(n_classes):
-        tree_gb = gb.estimators_[0][i]
-        j = i
-        if j < 2:
-            plot(tree_gb, axs2[j])
-        j += 1
 
         # Boundaries for all the tress
         CS = boundaries(X=X, y=y, model=cgb, tree=-1, class_=i, regression=True,
@@ -169,19 +177,28 @@ def model(random_state=1):
 
     # Plot Decision Boundaries
     for i, m in enumerate([cgb, gb]):
-        CS = boundaries(X=X, y=y, model=m, tree=0, class_=-1, regression=False,
+        CS = boundaries(X=X, y=y, model=m, tree=-1, class_=-1, regression=False,
                         title='C-GB' if i == 0 else 'GB', axs=axs3[i])
         fig3.colorbar(CS, ax=axs3[i])
 
     fig3.suptitle(
-        "Decision Boundaries for the first Decision Tree Regressor (Predicted values)")
+        "Decision Boundaries for the first Decision Tree Regressor (Predicted values) max_depth: " + str(max_depth))
     fig4.suptitle(
-        "Decision Boundaries of each class (Terminal values of regression trees)")
+        "Decision Boundaries of each class (Terminal values of regression trees) max_depth: " + str(max_depth))
     fig5.suptitle(
-        "Decision Boundaries of each class (Terminal values of first regression trees)")
+        "Decision Boundaries of each class (Terminal values of first regression trees) max_depth: " + str(max_depth))
     fig3.tight_layout()
     fig4.tight_layout()
     fig5.tight_layout()
+
+    fig1.savefig("C_GB_Tree.eps")
+
+    fig3.savefig("clf_boundaries.eps")
+    fig4.savefig('reg_boundaries_100_trees.eps')
+    fig5.savefig('reg_boundaries_one_Tree.eps')
+    fig2.savefig("GB_Tree_class0.eps")
+    fig6.savefig('GB_Tree_class1.eps')
+    fig7.savefig('GB_Tree_class2.eps')
 
 
 if __name__ == "__main__":
