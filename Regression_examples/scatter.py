@@ -1,14 +1,17 @@
-import seaborn as sns
-import warnings
-import numpy as np
-import pandas as pd
-from cgb import cgb_reg
-import matplotlib.pyplot as plt
-from scipy.stats import invgauss
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from scipy.stats import pearsonr
+from scipy.stats import invgauss
+import matplotlib.pyplot as plt
+from cgb import cgb_reg
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import warnings
+
+
 
 
 warnings.simplefilter('ignore')
@@ -22,7 +25,9 @@ def data():
         'overall_height', 'orientation', 'glazing_area',
         'glazing_area_distribution', 'heating_load', 'cooling_load'
     ]
-    data = pd.read_csv('energy.data', names=cl)
+    data = pd.read_csv(
+        r'D:\Academic\Ph.D\Programming\Datasets\Regression\energy.data',
+        names=cl)
     X = data.drop(['heating_load', 'cooling_load'], axis=1).values
     y = (data[['heating_load', 'cooling_load']]).values
     return X, y
@@ -70,7 +75,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         c="g",
         s=20,
         marker="s",
-        alpha=0.3,
+        # alpha=0.3,
         label="Real values",
     )
 
@@ -80,7 +85,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         # edgecolor="k",
         c="royalblue",
         s=20,
-        alpha=0.3,
+        # alpha=0.3,
         label='C-GB - R2-Score: %.3f' % r2_score(y, pred_cgb)
     )
 
@@ -91,7 +96,7 @@ def scatter(y, pred_cgb, pred_gb, axs):
         c="salmon",
         s=20,
         marker="^",
-        alpha=0.3,
+        # alpha=0.3,
         label='GB - R2-Score: %.3f' % r2_score(y, pred_gb),
     )
 
@@ -125,7 +130,7 @@ def distance(y, pred, agg):
 
 if __name__ == '__main__':
 
-    n = 10  # Training time
+    n = 10  # Training times
     size = (10, 7)  # Subplots size
     depth = 5
 
@@ -161,15 +166,16 @@ if __name__ == '__main__':
     euclidean_gb = np.sqrt(np.power(y_scl - pred_gb_scl, 2).sum(axis=1))
     euclidean_cgb = np.sqrt(np.power(y_scl - pred_cgb_scl, 2).sum(axis=1))
 
-    sns.distplot(a=euclidean_gb,  kde=False, fit=invgauss, bins=15,
-                 label='GB', color='salmon', hist_kws={"alpha": 0.6},
-                 fit_kws={"color": "r", "lw": 2, "label": "GB"},
+    sns.distplot(a=euclidean_gb,  kde=False, fit=invgauss, bins=10,
+                 label='GB', color='salmon',
+                 fit_kws={"color": "r", "lw": 1, "label": "GB"},
                  ax=axs1[0][1])
-    sns.distplot(a=euclidean_cgb,  kde=False, fit=invgauss, bins=15,
-                 label='C-GB', color='royalblue',
-                 hist_kws={"histtype": "step", "linewidth": 3,
-                           "alpha": 0.7},
-                 fit_kws={"color": "b", "lw": 2,
+    sns.distplot(a=euclidean_cgb,  kde=False, fit=invgauss, bins=10,
+                 label='C-GB', color='b',
+                 hist_kws={"histtype": "step",
+                           "linewidth": 1,
+                           "linestyle": "--"},
+                 fit_kws={"color": "b", "lw": 1,
                           "label": "C-GB", "linestyle": "--"},
                  ax=axs1[0][1])
 
@@ -179,17 +185,19 @@ if __name__ == '__main__':
     axs1[0][1].grid(True)
 
     # Maximum (Between two targets) Distance
-    sns.distplot(a=distance(y_scl, pred_gb_scl, np.max),  kde=False,
-                 fit=invgauss, label='GB', color='salmon', bins=15,
-                 hist_kws={"alpha": 0.6},
-                 fit_kws={"color": "r", "lw": 2, "label": "GB"},
+    max_dist_gb = distance(y_scl, pred_gb_scl, np.max)
+    sns.distplot(a=max_dist_gb,  kde=False,
+                 fit=invgauss, label='GB', color='salmon', bins=10,
+                 fit_kws={"color": "r", "lw": 1, "label": "GB"},
+                 hist_kws={"histtype": "bar"},
                  ax=axs1[1][0])
-    sns.distplot(a=distance(y_scl, pred_cgb_scl, np.max),  kde=False,
-                 fit=invgauss, label='C-GB', color='royalblue', bins=15,
-                 fit_kws={"color": "b", "lw": 2,
+    max_dist_cgb = distance(y_scl, pred_cgb_scl, np.max)
+    sns.distplot(a=max_dist_cgb,  kde=False,
+                 fit=invgauss, label='C-GB', color='b', bins=10,
+                 fit_kws={"color": "b", "lw": 1,
                           "label": "C-GB", "linestyle": "--"},
-                 hist_kws={"histtype": "step", "linewidth": 3,
-                           "alpha": 0.7},
+                 hist_kws={"histtype": "step",
+                           "linewidth": 1, 'linestyle': '--'},
                  ax=axs1[1][0])
 
     axs1[1][0].set_xlabel("Distance")
@@ -198,18 +206,38 @@ if __name__ == '__main__':
     axs1[1][0].grid(True)
 
     # Minimum (Between two targets) Distance
-    sns.distplot(a=distance(y_scl, pred_gb_scl, np.min),  kde=False,
-                 fit=invgauss, label='GB', color='salmon', bins=15,
-                 hist_kws={"alpha": 0.6},
-                 fit_kws={"color": "r", "lw": 2, "label": "GB"},
+    min_dist_gb = distance(y_scl, pred_gb_scl, np.min)
+    sns.distplot(a=min_dist_gb,  kde=False,
+                 fit=invgauss, label='GB', color='salmon', bins=10,
+                 fit_kws={"color": "r", "lw": 1, "label": "GB"},
                  ax=axs1[1][1])
-    sns.distplot(a=distance(y_scl, pred_cgb_scl, np.min),  kde=False,
-                 fit=invgauss, label='C-GB', color='royalblue', bins=15,
-                 fit_kws={"color": "b", "lw": 2,
+    min_dist_cgb = distance(y_scl, pred_cgb_scl, np.min)
+    sns.distplot(a=min_dist_cgb,  kde=False,
+                 fit=invgauss, label='C-GB', color='b', bins=10,
+                 fit_kws={"color": "b", "lw": 1,
                           "label": "C-GB", "linestyle": "--"},
-                 hist_kws={"histtype": "step", "linewidth": 3,
-                           "alpha": 0.7},
+                 hist_kws={"histtype": "step", "linewidth": 1, "linestyle": "--"
+                           },
                  ax=axs1[1][1])
+
+    # Compute the average of Maximum and Minimum 
+    # distance between the predicted and real values
+    print('Min_ave_CGB:', np.mean(min_dist_cgb))
+    print('Max_ave_CGB:', np.mean(max_dist_cgb))
+
+    print('Min_ave_GB:', np.mean(min_dist_gb))
+    print('Max_ave_GB:', np.mean(max_dist_gb))
+
+
+    # Compute the Pearson Correlation between the pairwise targets
+    corr = pd.DataFrame(
+        data=None, index=["Correlation"], columns=["CGB", "GB"])
+    corr.iloc[:, 0] = (pearsonr((y_scl[:, 0] - pred_cgb_scl[:, 0]),
+                                (y_scl[:, 1] - pred_cgb_scl[:, 1]))[0])
+    corr.iloc[:, 1] = (pearsonr((y_scl[:, 0] - pred_gb_scl[:, 0]),
+                                (y_scl[:, 1] - pred_gb_scl[:, 1]))[0])
+
+    print(corr)
 
     axs1[1][1].set_xlabel("Distance")
     axs1[1][1].set_title("Minimum Distance (Between targets)")
