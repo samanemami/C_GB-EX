@@ -25,9 +25,7 @@ def data():
         'overall_height', 'orientation', 'glazing_area',
         'glazing_area_distribution', 'heating_load', 'cooling_load'
     ]
-    data = pd.read_csv(
-        r'D:\Academic\Ph.D\Programming\Datasets\Regression\energy.data',
-        names=cl)
+    data = pd.read_csv('energy.data', names=cl)
     X = data.drop(['heating_load', 'cooling_load'], axis=1).values
     y = (data[['heating_load', 'cooling_load']]).values
     return X, y
