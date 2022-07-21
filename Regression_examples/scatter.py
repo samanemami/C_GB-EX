@@ -1,14 +1,14 @@
-import warnings
-import numpy as np
-import pandas as pd
-import seaborn as sns
-from cgb import cgb_reg
-import matplotlib.pyplot as plt
-from scipy.stats import invgauss
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold
-from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.model_selection import KFold
+from sklearn.preprocessing import StandardScaler
+from scipy.stats import invgauss
+import matplotlib.pyplot as plt
+from cgb import cgb_reg
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import warnings
 
 
 warnings.simplefilter('ignore')
@@ -16,21 +16,32 @@ random_state = 1
 np.random.seed(random_state)
 
 
-def data():
-    cl = [
-        'relative_compactness', 'surface_area', 'wall_area', 'roof_area',
-        'overall_height', 'orientation', 'glazing_area',
-        'glazing_area_distribution', 'heating_load', 'cooling_load'
-    ]
-    data = pd.read_csv('energy.data', names=cl)
-    X = data.drop(['heating_load', 'cooling_load'], axis=1).values
-    y = (data[['heating_load', 'cooling_load']]).values
+def data(dt):
+    if dt == 'Energy':
+        cl = [
+            'relative_compactness', 'surface_area', 'wall_area', 'roof_area',
+            'overall_height', 'orientation', 'glazing_area',
+            'glazing_area_distribution', 'heating_load', 'cooling_load'
+        ]
+        data = pd.read_csv('energy.data', names=cl)
+        X = data.drop(['heating_load', 'cooling_load'], axis=1).values
+        y = (data[['heating_load', 'cooling_load']]).values
+    elif dt == 'atp1d':
+        path = r'D:\Academic\Ph.D\Programming\Datasets\Regression\atp1d.csv'
+        df = pd.read_csv(path)
+        X = (df.iloc[:, 0:411]).values
+        y = (df.iloc[:, 411:417]).values
+    else:
+        path = r'D:\Academic\Ph.D\Programming\Datasets\Regression\atp7d.csv'
+        df = pd.read_csv(path)
+        X = (df.iloc[:, 0:411]).values
+        y = (df.iloc[:, 411:417]).values
     return X, y
 
 
-def model(max_depth, random_state):
+def model(max_depth, learning_rate, subsample, max_features, dt, random_state):
 
-    X, y = data()
+    X, y = data(dt)
 
     kfold = KFold(n_splits=10, shuffle=True, random_state=random_state)
     pred_cgb = np.zeros_like(y)
@@ -41,9 +52,9 @@ def model(max_depth, random_state):
         y_train, y_test = y[train_index], y[test_index]
 
         c_gb = cgb_reg(max_depth=5,
-                       subsample=0.75,
-                       #    max_features="sqrt",
-                       learning_rate=0.1,
+                       subsample=subsample,
+                       max_features=max_features,
+                       learning_rate=learning_rate,
                        random_state=random_state,
                        criterion="squared_error",
                        n_estimators=100)
@@ -51,10 +62,10 @@ def model(max_depth, random_state):
         c_gb.fit(x_train, y_train)
         pred_cgb[test_index] = c_gb.predict(x_test)
 
-        gb = GradientBoostingRegressor(max_depth=2,
-                                       subsample=1,
-                                       #    max_features="sqrt",
-                                       learning_rate=0.5,
+        gb = GradientBoostingRegressor(max_depth=max_depth,
+                                       subsample=subsample,
+                                       max_features=max_features,
+                                       learning_rate=learning_rate,
                                        random_state=random_state,
                                        criterion="squared_error",
                                        n_estimators=100)
@@ -62,7 +73,7 @@ def model(max_depth, random_state):
         gb.fit(x_train, y_train[:, 0])
         pred_gb[test_index, 0] = gb.predict(x_test)
 
-        gb = GradientBoostingRegressor(max_depth=5,
+        gb = GradientBoostingRegressor(max_depth=max_depth,
                                        subsample=0.75,
                                        #    max_features="sqrt",
                                        learning_rate=0.1,
@@ -147,9 +158,10 @@ if __name__ == '__main__':
     fig1, axs1 = plt.subplots(2, 2, figsize=size)
     fig2, axs2 = plt.subplots(1, 2, figsize=(10, 5))
     fig3, axs3 = plt.subplots(2, 2, figsize=size)
-    fig3.subplots_adjust(hspace=0, wspace=0)
+    fig3.subplots_adjust(hspace=0.1, wspace=0.1)
 
-    pred_cgb, pred_gb, y = model(max_depth=depth,
+    pred_cgb, pred_gb, y = model(max_depth=5, learning_rate=0.1,
+                                 subsample=0.75, max_features=None, dt='Energy',
                                  random_state=random_state)
 
     # Plot the Scatter, and histograms
@@ -252,11 +264,11 @@ if __name__ == '__main__':
 
     fig1.suptitle("Comparing C-GB and GB")
     fig1.tight_layout()
-    fig1.savefig('regression_plt.eps')
+    # fig1.savefig('regression_plt.eps')
 
     fig0.tight_layout()
-    fig1.savefig('regression_plt_datapoints.eps')
-    plt.close('all')
+    fig0.savefig('regression_plt_datapoints.eps')
+
 
     # Plot the hexbin
     labels = ["Heating", "Cooling"]
@@ -296,12 +308,8 @@ if __name__ == '__main__':
     axs3[0, 0].set_ylabel('predicted values')
     axs3[1, 0].set_ylabel('predicted values')
 
-    axs3[0, 1].set_yticks([])
-    axs3[1, 1].set_yticks([])
-
     axs3[0, 0].set_title('C-GB')
     axs3[0, 1].set_title('GB')
 
     fig3.suptitle('The relationship between predicted and real data points')
     fig3.savefig('Hexbin.eps')
-    plt.close('all')
