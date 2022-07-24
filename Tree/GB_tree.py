@@ -1,16 +1,15 @@
-from sklearn.ensemble import GradientBoostingClassifier
-from scipy.special import logsumexp
-from sklearn.tree import plot_tree
-import matplotlib.pyplot as plt
-import sklearn.datasets as dts
-from cgb import cgb_clf
-import numpy as np
 import warnings
+import numpy as np
+from cgb import cgb_clf
+import sklearn.datasets as dts
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+from scipy.special import logsumexp
+from sklearn.ensemble import GradientBoostingClassifier
 
 
 warnings.simplefilter("ignore")
 np.random.seed(1)
-n_classes = 3
 
 X, y = dts.make_classification(n_features=2,
                                n_redundant=0,
@@ -114,7 +113,7 @@ def model(random_state=1):
     max_depth = 3
 
     cgb = cgb_clf(max_depth=max_depth,
-                  subsample=1,
+                  subsample=0.75,
                   max_features="sqrt",
                   learning_rate=0.1,
                   random_state=random_state,
@@ -123,7 +122,7 @@ def model(random_state=1):
     cgb.fit(X, y)
 
     gb = GradientBoostingClassifier(max_depth=max_depth,
-                                    subsample=1,
+                                    subsample=0.75,
                                     max_features="sqrt",
                                     learning_rate=0.1,
                                     random_state=random_state,
