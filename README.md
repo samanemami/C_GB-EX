@@ -1,17 +1,17 @@
 # C_GB-EX
-Condensed Gradient Boosting Decision Tree - Examples
+Condensed-Gradient Boosting - Examples
 
 # About
 This project has five main purposes:
 <ul>
-<li> Provides additional comparisons </li>
-<li> Fixes the compared models' bugs </li>
-<li> provides real examples to use C-GB </li>
-<li> Provide the wrapper of different compared models </li>
+  <li> Provides additional comparisons </li>
+  <li> Fixes the compared models' bugs </li>
+  <li> provides real examples to use `C-GB` </li>
+  <li> Provide the wrapper of different compared models </li>
   <li> provides codes for reproduction the paper experiments </li>
 </ul>
 
-Moreover, in this project, one may find additional experiments which they are not in the paper.
+> Moreover, in this project, one may find additional experiments which they are not in the paper.
 
 # Usage
 First, the following packages should be installed. 
@@ -63,20 +63,20 @@ In the following, two samples of the included experiments are revealed. Of cours
 ### Visualization
 
 ### Decision boundary
-In the following, you will find an example of decision boundary for three studied models, including our Condensed Gradient Boosting model.
+In the following, you will find an example of decision boundary for three studied models, including the Condensed-Gradient Boosting (`C-GB`) model.
 
 ![![classification](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)](https://github.com/samanemami/C_GB-EX/blob/main/docs/example.jpg)
 
 
 ### Regression example
-Here, the C-GB model is trained at the same time for a multi-output regression problem with two outputs in one training procedure. As the plots show, the model works perfectly for all of the outputs.
+Here, the `C-GB` model is trained at the same time for a multi-output regression problem with two outputs in one training procedure. As the plots show, the model works perfectly for all of the outputs.
 
 ![![regression](https://raw.githubusercontent.com/samanemami/C_GB-EX/main/docs/Scatter_regression.jpg?token=GHSAT0AAAAAABSTP7JH6T4V5OI5VVXWKND6YTNC2UQ)](https://github.com/samanemami/C_GB-EX/blob/main/docs/Scatter_regression.jpg)
 
 
 
 # Requirements
-To run the related experiments of the paper, the following libraries would be required.  These libraries are only for related experiments. For the C-GB model, you do not need to install any library as it handles the dependencies.
+To run the related experiments of the paper, the following libraries would be required. These libraries are only for related experiments. For the `C-GB` model, you do not need to install any library as it handles the dependencies.
  
 <ul>
   <li> Numba </li>
