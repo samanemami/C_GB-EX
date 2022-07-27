@@ -31,12 +31,12 @@ For some of the experiments, it would be easier to use related wrappers. For thi
 # Models used for comparison
 
 * [C-GB - Last version](https://github.com/samanemami/C-GB)
-* [GradientBoostingClassifier - Last version](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
-* [GradientBoostingRegressor - Last version](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
+* [GB-Classifier - Last version](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
+* [GB-Regressor - Last version](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
 * [GBDT-MO - Version 0.0.1](https://arxiv.org/abs/1909.04373)
 * [TFBT - Version 2.4.1](https://git.kot.tools/nk2/syntaxnet_rus/-/tree/caae66a144f1237eb6b5c19fa00c317ca3bed09c/tensorflow/tensorflow/contrib/boosted_trees)
 
-> In the latest updates of the TensorFlow, the TFBT was marked as deprecated and replaced with the RF model. But you can find the base repository in the following [link](https://git.kot.tools/nk2/syntaxnet_rus/-/tree/caae66a144f1237eb6b5c19fa00c317ca3bed09c/tensorflow/tensorflow/contrib/boosted_trees).
+> In the latest updates of the `TensorFlow`, the `TFBT` was marked as deprecated and replaced with the `RF` model. But you can find the base repository in the following [link](https://git.kot.tools/nk2/syntaxnet_rus/-/tree/caae66a144f1237eb6b5c19fa00c317ca3bed09c/tensorflow/tensorflow/contrib/boosted_trees).
 
 # The included examples
 There are related codes for different experiments. The experiments are as follows;
