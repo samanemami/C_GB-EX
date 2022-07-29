@@ -19,7 +19,7 @@ First, the following packages should be installed.
 * [Condensed Gradient Boosting Decision Tree](https://github.com/samanemami/C-GB)
 * [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
 * [GradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
-* [BoostedTreesEstimator](https://www.tensorflow.org/api_docs/python/tf/estimator/BoostedTreesEstimator)
+* [BoostedTreesEstimator](https://ieeexplore.ieee.org/abstract/document/8257910?casa_token=JGZYyDrwWtMAAAAA:Pa-RpP1ho4yaE8b7lReDbjQEKLuP38m9aNjNPmAzgc2FETMMQXFEQurFEXEufitXrtvFafpAwM0)
 * [Gradient Boosted Decision Tree for Multiple Outputs](https://github.com/zzd1992/GBDTMO)
 
 For some of the experiments, it would be easier to use related wrappers. For this purpose, the wrappers have designed as the following;
