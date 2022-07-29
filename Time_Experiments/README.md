@@ -7,15 +7,11 @@ Instead of `time.time()`, we used `time.process_time()`, which returns the sum o
 
 The values of the hyperparameters for all of the models are the same with one random seed. As the `max_depth` has a significant effect on training speed, the experiments had done for different depths. The examples here are only for depth 5.
 
-### GB
+# GB
 
 We use Sklearn.GradientBoostingClassifier for the MART model. To have a fair comparison, we modify the prediction part for the [GB](GB.py) only.
 
-### Cross-validation
-
-To split the dataset, we used the ShuffleSplit cross-validation method with 10-folds to return the train and test indexes.
-
-### Wrappers
+# Wrappers
 
 For the `TFBT` and `GBDT-MO` models, the `time.process_time()` defined inside of their wrapper in the `_model_complexity` method, which returns a tuple of training time and consumed memory.
 
