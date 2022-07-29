@@ -7,9 +7,9 @@ Instead of `time.time()`, we used `time.process_time()`, which returns the sum o
 
 The values of the hyperparameters for all of the models are the same with one random seed. As the `max_depth` has a significant effect on training speed, the experiments had done for different depths. The examples here are only for depth 5.
 
-### MART
+### GB
 
-We use Sklearn.GradientBoostingClassifier for the MART model. To have a fair comparison, we modify the prediction part for the [MART](mart.py) only.
+We use Sklearn.GradientBoostingClassifier for the MART model. To have a fair comparison, we modify the prediction part for the [GB](GB.py) only.
 
 ### Cross-validation
 
