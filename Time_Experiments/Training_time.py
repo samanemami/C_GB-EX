@@ -2,17 +2,17 @@ import numpy as np
 import pandas as pd
 from time import process_time
 import sklearn.datasets as dt
+from Scikit_CGB import cgb_clf
 from gbdtmo import GBDTMulti, load_lib
 from TFBT import BoostedTreesClassifier
-from Scikit_CGB import C_GradientBoostingClassifier
+from GB import GradientBoostingClassifier_
 from sklearn.model_selection import train_test_split
-from mart import GradientBoostingClassifier
 
 
 X, y = dt.load_digits(return_X_y=True)
 
 
-max_depth = 5
+max_depth = 10
 random_state = 1
 # Define the path of the Dynamic lib from the related directory
 path = '/lustre/home/user/.local/lib/python~/site-packages/gbdtmo/build/gbdtmo.so'
@@ -23,14 +23,13 @@ x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=random_state)
 
 
-cgb = C_GradientBoostingClassifier(max_depth=max_depth,
-                                   subsample=1,
-                                   max_features="sqrt",
-                                   learning_rate=0.1,
-                                   random_state=random_state,
-                                   criterion="mse",
-                                   loss="deviance",
-                                   n_estimators=100)
+cgb = cgb_clf(max_depth=max_depth,
+              subsample=1,
+              max_features="sqrt",
+              learning_rate=0.1,
+              random_state=random_state,
+              loss="deviance",
+              n_estimators=100)
 # Computing the training time
 t0 = process_time()
 cgb.fit(x_train, y_train)
@@ -42,13 +41,12 @@ for i in range(100):
     cgb.predict(x_test)
 p_cgb = (process_time() - t0) / (100 * (x_test.shape[0]))
 
-mart = GradientBoostingClassifier(max_depth=max_depth,
-                                  subsample=1,
-                                  max_features="sqrt",
-                                  learning_rate=0.1,
-                                  random_state=random_state,
-                                  criterion="mse",
-                                  n_estimators=100)
+mart = GradientBoostingClassifier_(max_depth=max_depth,
+                                   subsample=1,
+                                   max_features="sqrt",
+                                   learning_rate=0.1,
+                                   random_state=random_state,
+                                   n_estimators=100)
 # Computing the training time
 t0 = process_time()
 mart.fit(x_train, y_train)
