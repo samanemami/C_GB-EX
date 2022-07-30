@@ -8,10 +8,6 @@ It shows the data distribution and model R2 score regarding the different depths
 
 Moreover, to have a clear idea about the relationship between the predicted and real values of each method and target, the hexbin plot within scatter plot has included.
 
-## KDE
-
-As an extra experiment, the related codes to reproduce the density analysis are included in the [kde](kde.py). The estimation of the probability density function (pdf) with the kernel function for the predicted and real values are included. This file produces the report of the relationship between two pair random variables, which could be the predicted values of each target or the real values. Due to the decision, you could select different variables for the method. 
-
 
 
 # Examples
