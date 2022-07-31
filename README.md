@@ -79,11 +79,11 @@ Here, the `C-GB` model is trained at the same time for a multi-output regression
 To run the related experiments of the paper, the following libraries would be required. These libraries are only for related experiments. For the `C-GB` model, you do not need to install any library as it handles the dependencies.
  
 <ul>
+  <li> SciPy </li>
   <li> Numba </li>
   <li> Numpy </li>
-  <li> SciPy </li>
-  <li> Pandas </li>
   <li> ctypes </li>
+  <li> Pandas </li>
   <li> Matplotlib </li>
   <li> tracemalloc </li>
   <li> memory_profiler </li>
