@@ -80,10 +80,10 @@ To run the related experiments of the paper, the following libraries would be re
  
 <ul>
   <li> SciPy </li>
-  <li> Numba </li>
-  <li> Numpy </li>
   <li> ctypes </li>
   <li> Pandas </li>
+  <li> Numba </li>
+  <li> Numpy </li>
   <li> Matplotlib </li>
   <li> tracemalloc </li>
   <li> memory_profiler </li>
