@@ -16,7 +16,7 @@ This project has five main purposes:
 # Usage
 First, the following packages should be installed. 
 
-* [Condensed Gradient Boosting Decision Tree](https://github.com/samanemami/C-GB)
+* [Condensed Gradient Boosting Decision Tree](https://github.com/GAA-UAM/C-GB)
 * [GradientBoostingClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
 * [GradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
 * [BoostedTreesEstimator](https://ieeexplore.ieee.org/abstract/document/8257910?casa_token=JGZYyDrwWtMAAAAA:Pa-RpP1ho4yaE8b7lReDbjQEKLuP38m9aNjNPmAzgc2FETMMQXFEQurFEXEufitXrtvFafpAwM0)
@@ -30,7 +30,7 @@ For some of the experiments, it would be easier to use related wrappers. For thi
 
 # Models used for comparison
 
-* [C-GB - Last version](https://github.com/samanemami/C-GB)
+* [C-GB - Last version](https://github.com/GAA-UAM/C-GB)
 * [GB-Classifier - Last version](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html)
 * [GB-Regressor - Last version](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html)
 * [GBDT-MO - Version 0.0.1](https://arxiv.org/abs/1909.04373)
